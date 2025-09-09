@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>应用中心</title>
+	<link rel="stylesheet" href="./style.css">
+	<style>
+	.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+	.app{background:#fff;border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center}
+	.icon{width:60px;height:60px;border-radius:12px;background:#FFD9C8}
+	.name{margin-top:8px;font-size:14px}
+	.section-title{font-weight:600;color:#7A5B4A;margin:12px 0 6px}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="nav"><div class="back">‹</div><div class="title">应用中心</div></div>
+		<main class="main">
+			<div class="section-title">宝宝管理</div>
+			<div class="grid">
+				<div class="app"><div class="icon"></div><div class="name">成长记录</div><div class="annotation">点击→成长记录页</div></div>
+				<div class="app"><div class="icon"></div><div class="name">疫苗提醒</div><div class="annotation">点击→疫苗提醒页</div></div>
+				<div class="app"><div class="icon"></div><div class="name">身高体重</div><div class="annotation">点击→身高体重页</div></div>
+				<div class="app"><div class="icon"></div><div class="name">打卡任务</div><div class="annotation">点击→打卡任务页</div></div>
+			</div>
+		</main>
+		<div class="tabbar">
+			<div class="tab">宝宝</div>
+			<div class="tab active">应用</div>
+			<div class="tab">时光</div>
+			<div class="tab">我的</div>
+		</div>
+	</div>
+</body>
+</html>

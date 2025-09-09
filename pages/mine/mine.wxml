@@ -1,0 +1,17 @@
+<view class="page">
+	<view class="card">
+		<view class="row">
+			<t-avatar size="60"></t-avatar>
+			<view class="info">
+				<text class="nick">微信昵称</text>
+				<t-tag theme="primary" variant="light">爸爸</t-tag>
+			</view>
+			<text class="edit" bindtap="goProfile">✎</text>
+		</view>
+	</view>
+	<t-cell-group>
+		<t-cell title="修改个人资料" arrow bindtap="goProfile" />
+		<t-cell title="编辑宝宝简介" arrow />
+	</t-cell-group>
+	<view class="footer">关于我们 · 帮助中心</view>
+</view>

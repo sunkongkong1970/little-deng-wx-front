@@ -1,0 +1,20 @@
+<view class="page">
+	<view class="publisher">
+		<view class="row">
+			<t-avatar size="36"></t-avatar>
+			<t-input value="{{content}}" placeholder="分享宝宝的美好时光..." bindchange="onContentChange" />
+			<t-button theme="primary" disabled="{{!canPost}}" bindtap="onPost">发布</t-button>
+		</view>
+		<text class="annotation">点击输入框 → 展开发布面板（上传图片 / 选择位置）</text>
+	</view>
+	<view class="feed">
+		<block wx:for="{{posts}}" wx:key="index">
+			<view class="post">
+				<view class="head"><t-avatar size="36"></t-avatar><text class="nick">{{item.nick}}</text></view>
+				<view class="content">{{item.text}}</view>
+				<view class="meta">{{item.time}} <text wx:if="{{item.loc}}">📍 {{item.loc}}</text></view>
+				<view class="actions-row"><text bindtap="noop">👍 赞</text><text bindtap="noop">💬 评论</text></view>
+			</view>
+		</block>
+	</view>
+</view>

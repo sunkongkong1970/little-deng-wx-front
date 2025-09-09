@@ -1,0 +1,68 @@
+{
+  "pages": [
+    "pages/authLogin/authLogin",
+    "pages/familySelect/familySelect",
+    "pages/roleSetting/roleSetting",
+    "pages/baby/baby",
+    "pages/apps/apps",
+    "pages/moment/moment",
+    "pages/mine/mine",
+    "pages/inviteCode/inviteCode"
+  ],
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#07C160",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/baby/baby",
+        "text": "宝宝",
+        "iconPath": "assets/default.png",
+        "selectedIconPath": "assets/default.png"
+      },
+      {
+        "pagePath": "pages/apps/apps",
+        "text": "应用",
+        "iconPath": "assets/default.png",
+        "selectedIconPath": "assets/default.png"
+      },
+      {
+        "pagePath": "pages/moment/moment",
+        "text": "时光",
+        "iconPath": "assets/default.png",
+        "selectedIconPath": "assets/default.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "assets/default.png",
+        "selectedIconPath": "assets/default.png"
+      }
+    ]
+  },
+  "usingComponents": {
+    "t-button": "miniprogram_npm/tdesign-miniprogram/button/button",
+    "t-input": "miniprogram_npm/tdesign-miniprogram/input/input",
+    "t-toast": "miniprogram_npm/tdesign-miniprogram/toast/toast",
+    "t-dialog": "miniprogram_npm/tdesign-miniprogram/dialog/dialog",
+    "t-avatar": "miniprogram_npm/tdesign-miniprogram/avatar/avatar",
+    "t-image": "miniprogram_npm/tdesign-miniprogram/image/image",
+    "t-grid": "miniprogram_npm/tdesign-miniprogram/grid/grid",
+    "t-grid-item": "miniprogram_npm/tdesign-miniprogram/grid-item/grid-item",
+    "t-cell": "miniprogram_npm/tdesign-miniprogram/cell/cell",
+    "t-cell-group": "miniprogram_npm/tdesign-miniprogram/cell-group/cell-group",
+    "t-radio": "miniprogram_npm/tdesign-miniprogram/radio/radio",
+    "t-radio-group": "miniprogram_npm/tdesign-miniprogram/radio-group/radio-group",
+    "t-tag": "miniprogram_npm/tdesign-miniprogram/tag/tag"
+  },
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "亲子时光",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

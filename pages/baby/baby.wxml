@@ -1,0 +1,19 @@
+<view class="page">
+	<block wx:if="{{!hasBaby}}">
+		<view class="empty">
+			<view class="hint">添加宝宝</view>
+			<view class="dashed" bindtap="onAddBaby">+
+			</view>
+		</view>
+	</block>
+	<block wx:else>
+		<view class="filled">
+			<t-image width="200" height="200" src="/assets/sample-baby.jpg" mode="aspectFill" />
+			<view class="info">
+				<text class="name">小暖</text>
+				<text class="meta">女宝 · 2024-05-01</text>
+			</view>
+			<view class="edit" bindtap="onEdit">编辑</view>
+		</view>
+	</block>
+</view>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>时光</title>
+	<link rel="stylesheet" href="./style.css">
+	<style>
+	.feed{display:flex;flex-direction:column;gap:12px}
+	.post{background:var(--td-bg-color-container);border-radius:12px;padding:12px;box-shadow:var(--td-shadow-1)}
+	.post .head{display:flex;gap:8px;align-items:center}
+	.avatar-s{width:36px;height:36px;border-radius:50%;background:#E8F8EE;border:1px solid #d9efe2}
+	.nick{font-weight:600}
+	.content{margin-top:8px}
+	.photos{margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+	.photo{width:100%;aspect-ratio:1/1;background:#f5f6f7;border-radius:6px}
+	.meta{margin-top:8px;color:var(--td-text-color-placeholder);font-size:12px;display:flex;gap:8px;align-items:center}
+	.actions-row{display:flex;gap:12px;color:var(--td-text-color-secondary);font-size:14px;margin-top:8px}
+	.publisher{background:var(--td-bg-color-container);border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:var(--td-shadow-1)}
+	.publisher .row{gap:8px}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="nav"><div class="back">‹</div><div class="title">时光</div></div>
+		<main class="main">
+			<div class="publisher">
+				<div class="row">
+					<div class="avatar-s"></div>
+					<input class="input full" placeholder="分享宝宝的美好时光..." />
+					<button class="btn btn-primary" disabled>发布</button>
+				</div>
+				<div class="annotation">点击输入框 → 展开发布面板（上传图片 / 选择位置）</div>
+			</div>
+			<div class="feed">
+				<div class="post">
+					<div class="head"><div class="avatar-s"></div><div class="nick">小暖妈妈</div></div>
+					<div class="content">今天第一次翻身啦！</div>
+					<div class="photos"><div class="photo"></div><div class="photo"></div><div class="photo"></div></div>
+					<div class="meta">2025-09-08 10:20 <span>📍 人民公园</span></div>
+					<div class="actions-row"><span>👍 赞</span><span>💬 评论</span></div>
+				</div>
+				<div class="post">
+					<div class="head"><div class="avatar-s"></div><div class="nick">小暖爸爸</div></div>
+					<div class="content">午睡香甜～</div>
+					<div class="meta">2025-09-08 09:00</div>
+					<div class="actions-row"><span>👍 赞</span><span>💬 评论</span></div>
+				</div>
+			</div>
+		</main>
+		<div class="tabbar">
+			<div class="tab">宝宝</div>
+			<div class="tab">应用</div>
+			<div class="tab active">时光</div>
+			<div class="tab">我的</div>
+		</div>
+	</div>
+</body>
+</html>

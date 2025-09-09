@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>原型统一预览（iPhone 16 框）</title>
+	<link rel="stylesheet" href="./style.css">
+	<style>
+	body{background:#f0f2f5}
+	.shell{max-width:460px;margin:24px auto}
+	.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:12px}
+	.select{height:36px;border-radius:8px;border:1px solid #ddd;padding:0 8px}
+	.phone{width:430px;margin:0 auto;background:#111;border-radius:48px;padding:18px 12px 28px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+	.dynamic-island{width:180px;height:28px;background:#000;border-radius:14px;margin:0 auto 12px}
+	.screen{background:#FFF9F4;border-radius:36px;overflow:hidden}
+	.screen iframe{width:100%;height:780px;border:0;display:block}
+	.note{color:#666;text-align:center;font-size:12px;margin-top:6px}
+	@media (max-width:460px){.phone{width:calc(100% - 16px)}}
+	</style>
+</head>
+<body>
+	<div class="shell">
+		<div class="toolbar">
+			<select id="page" class="select">
+				<option value="auth-login.html">授权登录</option>
+				<option value="family-choice.html">家庭初始选择</option>
+				<option value="user-profile.html">完善个人信息</option>
+				<option value="baby-empty.html">宝宝（无宝宝）</option>
+				<option value="baby-filled.html">宝宝（有宝宝）</option>
+				<option value="apps-special.html">应用中心（特殊）</option>
+				<option value="time-feed.html">时光</option>
+				<option value="mine-normal.html">我的（普通）</option>
+				<option value="mine-special.html">我的（特殊）</option>
+				<option value="invite-code.html">生成邀请码</option>
+			</select>
+			<select id="zoom" class="select">
+				<option value="375">375px</option>
+				<option value="390">390px</option>
+				<option value="414">414px</option>
+				<option value="430" selected>430px (iPhone 16 Pro Max 逻辑宽)</option>
+			</select>
+		</div>
+		<div class="phone">
+			<div class="dynamic-island"></div>
+			<div class="screen" id="screen">
+				<iframe id="frame" src="auth-login.html"></iframe>
+			</div>
+		</div>
+		<div class="note">使用上方下拉切换页面与宽度，外框模拟 iPhone 16 视觉</div>
+	</div>
+	<script>
+	const page = document.getElementById('page');
+	const zoom = document.getElementById('zoom');
+	const frame = document.getElementById('frame');
+	const screen = document.getElementById('screen');
+	page.addEventListener('change',()=>{frame.src = page.value});
+	function applyWidth(){
+		const w = parseInt(zoom.value,10); // logical width
+		screen.style.width = w+'px';
+	}
+	zoom.addEventListener('change',applyWidth);
+	applyWidth();
+	</script>
+</body>
+</html>

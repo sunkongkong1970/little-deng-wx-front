@@ -1,0 +1,21 @@
+<view class="page">
+	<text class="section">宝宝管理</text>
+	<t-grid column="2" gutter="15">
+		<t-grid-item bindtap="goGrowth">
+			<t-image src="/assets/default.png" width="60" height="60" shape="circle" />
+			<text class="label">成长记录</text>
+		</t-grid-item>
+		<t-grid-item bindtap="goVaccine">
+			<t-image src="/assets/default.png" width="60" height="60" shape="circle" />
+			<text class="label">疫苗提醒</text>
+		</t-grid-item>
+		<t-grid-item>
+			<t-image src="/assets/default.png" width="60" height="60" shape="circle" />
+			<text class="label">身高体重</text>
+		</t-grid-item>
+		<t-grid-item>
+			<t-image src="/assets/default.png" width="60" height="60" shape="circle" />
+			<text class="label">辅食推荐</text>
+		</t-grid-item>
+	</t-grid>
+</view>

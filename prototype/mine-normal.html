@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>我的（普通用户）</title>
+	<link rel="stylesheet" href="./style.css">
+	<style>
+	.footer-links{margin-top:12px;color:var(--td-text-color-placeholder);text-align:center;font-size:12px}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="nav"><div class="back">‹</div><div class="title">我的</div></div>
+		<main class="main">
+			<div class="card">
+				<div class="row" style="gap:12px;align-items:center">
+					<div class="avatar"></div>
+					<div>
+						<div style="font-weight:600">微信昵称</div>
+						<div class="tag" style="font-size:12px;background:#E6F4FF;color:#1677ff;border-radius:8px;padding:2px 6px">爸爸</div>
+					</div>
+					<div style="margin-left:auto;color:var(--td-brand-color)">✎</div>
+				</div>
+			</div>
+			<div class="list" style="margin-top:12px;">
+				<div class="list-item"><div class="list-left"><div class="list-icon"></div><div>修改个人资料</div></div><div>›</div></div>
+				<div class="list-item"><div class="list-left"><div class="list-icon"></div><div>编辑宝宝简介</div></div><div>›</div></div>
+				<!-- 特权项在普通用户隐藏 -->
+			</div>
+			<div class="footer-links">关于我们 · 帮助中心</div>
+		</main>
+		<div class="tabbar">
+			<div class="tab">宝宝</div>
+			<div class="tab">应用</div>
+			<div class="tab">时光</div>
+			<div class="tab active">我的</div>
+		</div>
+	</div>
+</body>
+</html>

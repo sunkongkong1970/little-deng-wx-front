@@ -1,0 +1,12 @@
+<view class="page">
+	<view class="brand">
+		<t-image src="/assets/default.png" width="80" height="80" shape="round" />
+		<text class="slogan">欢迎使用 亲子时光 小程序，登录后即可管理家庭与宝宝信息</text>
+	</view>
+	<view class="actions">
+		<t-button theme="primary" block icon="logo-wechat" bindtap="onAuthorize">微信授权登录</t-button>
+		<text class="hint">登录将获取您的微信昵称、头像及 openid，用于身份识别</text>
+	</view>
+	<t-dialog id="authDialog" visible="{{authVisible}}" title="授权请求" content="是否允许小程序获取您的微信昵称、头像？" confirmBtn="允许" cancelBtn="拒绝" bind:confirm="onConfirm" bind:cancel="onCancel" />
+	<t-toast id="toast" />
+</view>

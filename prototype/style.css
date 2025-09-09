@@ -1,0 +1,78 @@
+/* Base layout with TDesign-like tokens and WeChat tone */
+:root{
+  --td-brand-color:#07C160; /* WeChat green */
+  --td-brand-color-hover:#06ab54;
+  --td-brand-color-active:#05964a;
+  --td-text-color-primary:#111;
+  --td-text-color-secondary:#666;
+  --td-text-color-placeholder:#999;
+  --td-bg-color-page:#f5f6f7;
+  --td-bg-color-container:#ffffff;
+  --td-border-color:#eee;
+  --td-divider-color:#f0f0f0;
+  --td-radius-l:16px;
+  --td-radius-m:12px;
+  --td-radius-s:8px;
+  --td-shadow-1:0 4px 16px rgba(0,0,0,.06);
+}
+html,body{margin:0;padding:0;background:var(--td-bg-color-page);color:var(--td-text-color-primary);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial}
+.container{max-width:375px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
+/* Nav bar */
+.nav{height:48px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;background:var(--td-bg-color-container);border-bottom:1px solid var(--td-divider-color);z-index:5}
+.nav .back{position:absolute;left:12px;font-size:18px;color:var(--td-text-color-placeholder)}
+.nav .title{font-weight:600;color:var(--td-text-color-primary)}
+
+/* Sections */
+.main{flex:1;padding:16px}
+.brand{display:flex;flex-direction:column;align-items:center;margin-top:48px}
+.brand .logo{width:96px;height:96px;border-radius:16px;background:#E8F8EE;display:block}
+.brand .slogan{margin-top:12px;font-size:14px;color:var(--td-text-color-secondary);text-align:center}
+
+/* Buttons and inputs (TDesign-like) */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:22px;border:0;cursor:pointer;transition:background-color .15s ease,color .15s ease,opacity .15s ease}
+.btn-primary{background:var(--td-brand-color);color:#fff}
+.btn-primary:hover{background:var(--td-brand-color-hover)}
+.btn-primary:active{background:var(--td-brand-color-active)}
+.btn[disabled],.is-disabled{opacity:.5;cursor:not-allowed}
+.btn:hover{opacity:.98}
+.btn-plain{background:transparent;color:var(--td-brand-color)}
+.input{height:44px;padding:0 12px;border:1px solid var(--td-border-color);border-radius:12px;background:#fff;outline:0}
+.input:focus{border-color:var(--td-brand-color)}
+.row{display:flex;gap:12px;align-items:center}
+.full{width:100%}
+
+/* Annotations */
+.annotation{display:block;margin-top:8px;color:var(--td-text-color-secondary);font-size:12px}
+.hint{margin-top:8px;color:var(--td-text-color-placeholder);font-size:12px;text-align:center}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;background:#fff;border-radius:12px;padding:16px;box-shadow:var(--td-shadow-1)}
+.modal .title{font-weight:600}
+.modal .desc{margin-top:6px;color:var(--td-text-color-secondary);font-size:14px}
+.modal .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+/* Avatar & form */
+.avatar{width:96px;height:96px;border-radius:50%;background:#E8F8EE;border:2px solid #c9edd7}
+.center{display:flex;flex-direction:column;align-items:center}
+.form .field{margin-top:12px}
+.label{font-size:14px;color:var(--td-text-color-secondary)}
+.select{height:44px;border:1px solid var(--td-border-color);border-radius:12px;background:#fff;display:flex;align-items:center;padding:0 12px;color:var(--td-text-color-placeholder)}
+
+/* Baby boxes */
+.dashed-box{width:200px;height:200px;border:2px dashed #ddd;border-radius:12px;margin:12px auto;background:#fff;display:flex;align-items:center;justify-content:center}
+.plus{font-size:48px;color:var(--td-brand-color)}
+
+/* Cards */
+.card{background:var(--td-bg-color-container);border-radius:12px;padding:12px;box-shadow:var(--td-shadow-1)}
+.list{background:var(--td-bg-color-container);border-radius:12px;overflow:hidden;box-shadow:var(--td-shadow-1)}
+.list-item{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;border-bottom:1px solid var(--td-divider-color)}
+.list-item:last-child{border-bottom:none}
+.list-left{display:flex;align-items:center;gap:8px}
+.list-icon{width:24px;height:24px;background:#E8F8EE;border-radius:6px}
+
+/* Tabbar */
+.tabbar{height:56px;background:#fff;border-top:1px solid var(--td-divider-color);display:flex}
+.tabbar .tab{flex:1;display:flex;align-items:center;justify-content:center;color:var(--td-text-color-secondary)}
+.tabbar .active{color:var(--td-brand-color);font-weight:600}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>授权登录</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+	<div class="container">
+		<div class="nav"><div class="back">‹</div><div class="title">授权登录</div></div>
+		<main class="main">
+			<div class="brand">
+				<img class="logo" src="../assets/logo.png" alt="logo">
+				<div class="slogan">欢迎使用 亲子时光 小程序，登录后即可管理家庭与宝宝信息</div>
+			</div>
+			<div class="center" style="margin-top:48px;">
+				<button class="btn btn-primary full" style="max-width:300px">微信授权登录</button>
+				<div class="hint">登录将获取您的微信昵称、头像及openid，用于身份识别</div>
+				<div class="annotation">点击 → 触发微信原生授权弹窗（模拟）</div>
+			</div>
+		</main>
+		<!-- 模拟授权弹窗 -->
+		<div class="overlay" style="display:none"></div>
+		<div class="modal" style="display:none">
+			<div class="title">请求获得以下权限</div>
+			<div class="desc">获取您的昵称、头像和OpenID</div>
+			<div class="actions">
+				<button class="btn btn-plain">拒绝</button>
+				<button class="btn btn-primary">允许</button>
+			</div>
+			<div class="annotation">允许 → 家庭初始选择页；拒绝 → 提示继续授权</div>
+		</div>
+	</div>
+</body>
+</html>
