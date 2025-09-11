@@ -2,9 +2,10 @@ import api from '../../api.js';
 Page({
   data: {
     authVisible: false,
-    loading: false
+    loading: false,
   },
   async onLoad() {
+    this.setData({ errorMsg: '' });
     try {
       const token = wx.getStorageSync('token');
       if (token) {
@@ -13,8 +14,7 @@ Page({
           throw new Error(res?.message || '获取用户信息失败');
         }
         const user = res.data;
-        console.log("1111"+user)
-        console.log("2222"+user.homeId)
+
         if (user.homeId) {
           wx.reLaunch({
             url: '/pages/baby/baby'
@@ -26,7 +26,7 @@ Page({
         }
       }
     } catch (e) {
-      log.error(e)
+    
     } finally {
       this.setData({
         loading: false
@@ -78,7 +78,7 @@ Page({
       this.setData({
         authVisible: false
       });
-      if (user.familyId) {
+      if (user.homeId) {
         wx.reLaunch({
           url: '/pages/baby/baby'
         });
