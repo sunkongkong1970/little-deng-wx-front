@@ -11,17 +11,26 @@ function request(url, method = 'GET', data = {},params = {}) {
             method: method,
             data: data,
             header: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                // 携带本地 token（兼容多种后端读取方式）
+                ...(wx.getStorageSync('token') ? {
+                    'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+                    'token': wx.getStorageSync('token'),
+                    'X-Token': wx.getStorageSync('token')
+                } : {})
             },
             success: (res) => {
                 if (res.statusCode === 200) {
                     resolve(res.data);
                 } else {
-                    reject(new Error(`请求失败，状态码: ${res.statusCode}`));
+                    const serverMsg = (res.data && (res.data.message || res.data.msg || res.data.error)) || '';
+                    const errMsg = serverMsg || `请求失败，状态码: ${res.statusCode}`;
+                    reject(new Error(errMsg));
                 }
             },
             fail: (err) => {
-                reject(err);
+                const errMsg = err && (err.errMsg || err.message) ? (err.errMsg || err.message) : '网络异常，请稍后重试';
+                reject(new Error(errMsg));
             }
         });
     });
@@ -30,7 +39,7 @@ function request(url, method = 'GET', data = {},params = {}) {
 const api = {
     // 获取用户信息
     login: (code) => request('/api/wechat/login','POST',{}, { code }),
-    getUserInfo: () => request('/user/info'),
+    getUserInfo: (token) => request('/api/user/token','POST',{}, { token }),
     // 提交表单数据
     submitForm: (formData) => request('/form/submit', 'POST', formData)
 };

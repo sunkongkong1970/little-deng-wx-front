@@ -4,6 +4,35 @@ Page({
     authVisible: false,
     loading: false
   },
+  async onLoad() {
+    try {
+      const token = wx.getStorageSync('token');
+      if (token) {
+        const res = await api.getUserInfo(token);
+        if (!res || res.code !== 0 || !res.data) {
+          throw new Error(res?.message || '获取用户信息失败');
+        }
+        const user = res.data;
+        console.log("1111"+user)
+        console.log("2222"+user.homeId)
+        if (user.homeId) {
+          wx.reLaunch({
+            url: '/pages/baby/baby'
+          });
+        } else {
+          wx.reLaunch({
+            url: '/pages/familySelect/familySelect'
+          });
+        }
+      }
+    } catch (e) {
+      log.error(e)
+    } finally {
+      this.setData({
+        loading: false
+      });
+    }
+  },
   onAuthorize() {
     this.setData({
       authVisible: true
@@ -11,19 +40,18 @@ Page({
   },
   async onConfirm() {
     if (this.data.loading) return;
-    this.setData({ loading: true });
+    this.setData({
+      loading: true
+    });
     try {
       // 1. 获取登录凭证code
-      const { code } = await wx.login();
+      const {
+        code
+      } = await wx.login();
       if (!code) {
         throw new Error('获取code失败');
       }
-      // 2. 调用后端接口获取token
-      // const res = await wx.request({
-      //   url: '127.0.0.1:8080/little-deng-service/api/wechat/login',
-      //   method: 'POST',
-      //   data: { code }
-      // });
+
       const res = await api.login(code);
 
       if (!res || res.code !== 0 || !res.data) {
@@ -33,30 +61,43 @@ Page({
         throw new Error(res?.message || '登录失败');
       }
 
-      // 3. 存储token和用户信息
-      const { token, userId } = res.data;
+      // 3. 存储token
+      const {
+        token
+      } = res.data;
       wx.setStorageSync('token', token);
-      wx.setStorageSync('userId', userId);
-      
-      // 4. 登录成功，跳转到首页
-      wx.showToast({ title: '登录成功' });
+      // 4. 获取用户信息并按家庭状态跳转
+      const userRes = await api.getUserInfo(token);
+      if (!userRes || userRes.code !== 0 || !userRes.data) {
+        throw new Error(userRes?.message || '获取用户信息失败');
+      }
+      const user = userRes.data;
+      wx.showToast({
+        title: '登录成功'
+      });
       this.setData({
         authVisible: false
       });
-      setTimeout(() => {
-        wx.navigateTo({
+      if (user.familyId) {
+        wx.reLaunch({
+          url: '/pages/baby/baby'
+        });
+      } else {
+        wx.reLaunch({
           url: '/pages/familySelect/familySelect'
         });
-      }, 300);
-      
+      }
+
     } catch (err) {
       console.error('登录失败:', err);
-      wx.showToast({ 
-        title: err.message || '登录失败', 
-        icon: 'none' 
+      wx.showToast({
+        title: err.message || '登录失败',
+        icon: 'none'
       });
     } finally {
-      this.setData({ loading: false });
+      this.setData({
+        loading: false
+      });
     }
   },
   onCancel() {
