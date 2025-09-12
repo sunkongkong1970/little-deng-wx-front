@@ -37,9 +37,21 @@ function request(url, method = 'GET', data = {},params = {}) {
 }
 // 定义具体的API请求方法
 const api = {
+    // 登录
+    userLogin: (code) => request('/api/wechat/login','POST',{}, { code }),
     // 获取用户信息
-    login: (code) => request('/api/wechat/login','POST',{}, { code }),
     getUserInfo: (token) => request('/api/user/token','POST',{}, { token }),
+    // 添加家庭
+    addHome: (token) => request('/api','POST',{}, { token }),
+    // 加入家庭
+    joinHome:(token,homeCode) => request('/api','POST',{}, { token, homeCode}),
+
+    // 角色选项（下拉框）
+    getRoleOptions: () => request('/api/dict/role','GET'),
+
+    // 更新用户资料（角色与昵称）
+    updateUser: ({ userRoleName, userName }) => request('/api/user/update','POST', { userRoleName, userName }),
+
     // 提交表单数据
     submitForm: (formData) => request('/form/submit', 'POST', formData)
 };

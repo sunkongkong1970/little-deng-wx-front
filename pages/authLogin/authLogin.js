@@ -52,7 +52,7 @@ Page({
         throw new Error('获取code失败');
       }
 
-      const res = await api.login(code);
+      const res = await api.userLogin(code);
 
       if (!res || res.code !== 0 || !res.data) {
         this.setData({

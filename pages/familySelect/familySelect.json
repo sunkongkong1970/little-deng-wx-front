@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "加入/创建家庭"
+  "navigationBarTitleText": "加入/创建家庭",
+  "usingComponents": {
+  
+  }
 }
