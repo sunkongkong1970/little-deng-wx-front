@@ -21,9 +21,8 @@
 				</view>
 				<view class="field">
 					<view class="label">角色</view>
-					<t-picker value="{{rolePickerValue}}" bind:change="onRoleChange" bind:confirm="onRoleConfirm">
+					<t-picker class="role-picker" value="{{rolePickerValue}}" keys="{{ { value: 'value', label: 'label' } }}" usePopup="{{false}}" header="{{false}}" cancelBtn="{{false}}" confirmBtn="{{false}}" bind:change="onRoleChange" bind:confirm="onRoleConfirm">
 						<t-picker-item options="{{roleOptions}}"></t-picker-item>
-						<view class="picker-trigger">{{ roleLabel }}</view>
 					</t-picker>
 				</view>
 			</view>
