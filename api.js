@@ -21,7 +21,22 @@ function request(url, method = 'GET', data = {},params = {}) {
             },
             success: (res) => {
                 if (res.statusCode === 200) {
-                    resolve(res.data);
+                    const body = res.data;
+                    if (body && typeof body === 'object' && Object.prototype.hasOwnProperty.call(body, 'code')) {
+                        if (body.code === 0) {
+                            // 业务成功：优先返回 data，否则返回整个 body
+                            resolve(typeof body.data === 'undefined' ? body : body.data);
+                        } else {
+                            const message = (body && (body.message || body.msg || body.error)) || '业务异常';
+                            const error = new Error(`[${body.code}] ${message}`);
+                            error.code = body.code;
+                            error.response = body;
+                            reject(error);
+                        }
+                    } else {
+                        // 未按约定返回 code 字段，则原样返回
+                        resolve(body);
+                    }
                 } else {
                     const serverMsg = (res.data && (res.data.message || res.data.msg || res.data.error)) || '';
                     const errMsg = serverMsg || `请求失败，状态码: ${res.statusCode}`;
@@ -41,16 +56,15 @@ const api = {
     userLogin: (code) => request('/api/wechat/login','POST',{}, { code }),
     // 获取用户信息
     getUserInfo: (token) => request('/api/user/token','POST',{}, { token }),
-    // 添加家庭
-    addHome: (token) => request('/api','POST',{}, { token }),
     // 加入家庭
-    joinHome:(token,homeCode) => request('/api','POST',{}, { token, homeCode}),
-
+    joinHome:(token,homeCode) => request('/api/','POST',{}, { token, homeCode}),
+    // 创建家庭
+    createHome:(token, homeName) => request('/api/home/createHome','POST',{token, homeName}, {}),
     // 角色选项（下拉框）
-    getRoleOptions: () => request('/api/dict/role','GET'),
+    getRoleOptions: (type) => request('/api/dict/dictList','GET',{type}),
 
     // 更新用户资料（角色与昵称）
-    updateUser: ({ userRoleName, userName }) => request('/api/user/update','POST', { userRoleName, userName }),
+    userJoinHome: ({ token,userRole, userName,homeCode }) => request('/api/user/joinHome','POST', { token,userRole, userName,homeCode }),
 
     // 提交表单数据
     submitForm: (formData) => request('/form/submit', 'POST', formData)

@@ -8,7 +8,10 @@ Page({
     roleOptions: [],
     rolePickerValue: [],
     roleLabel: '请选择角色',
-    saving: false
+    saving: false,
+    // 创建家庭模式开关与家庭名称
+    createMode: false,
+    familyName: ''
   },
   onCodeChange(e) {
     const value = e.detail.value || '';
@@ -21,17 +24,17 @@ Page({
     this.openProfileSheet();
   },
   onAdd() {
-    wx.navigateTo({
-      url: '/pages/roleSetting/roleSetting'
-    });
+    // 进入创建家庭模式，打开底部弹窗
+    this.openProfileSheet(true);
   },
-  openProfileSheet() {
+  openProfileSheet(create = false) {
     // 默认从微信获取昵称头像
     this.fetchDefaultProfile();
     // 拉取角色选项
     this.loadRoleOptions();
     this.setData({
-      showSheet: true
+      showSheet: true,
+      createMode: !!create
     });
   },
   onSheetVisibleChange(e) {
@@ -55,7 +58,6 @@ Page({
             success(d) {
               
               const temp = d.tempFilePath;
-              console.log(temp)
               try {
                 const fs = wx.getFileSystemManager();
                 const savePath = `${wx.env.USER_DATA_PATH}/avatar_${Date.now()}.png`;
@@ -114,19 +116,10 @@ Page({
       }
     })
   },
-  // loadRoleOptions(){
-  //   this.setData({
-  //     roleOptions: [{ label: '爸爸', value: 'baba' }],
-  //     rolePickerValue: ['baba'],
-  //     roleLabel: '爸爸'
-  //   });
-  // },
   loadRoleOptions() {
     const api = require('../../api.js').default || require('../../api.js');
-    api.getRoleOptions().then((res) => {
-      console.log('getRoleOptions res:', res);
+    api.getRoleOptions('role').then((res) => {
       const raw = (res && (res.data || res)) || {};
-      console.log('getRoleOptions raw:', raw);
       let labels = [];
       if (Array.isArray(raw)) {
         labels = raw.map((item, index) => {
@@ -158,23 +151,21 @@ Page({
           value: String(roleId)
         }));
       }
-      console.log('getRoleOptions labels:', labels);
+      // 根据数据条数设置首次定位：>=3 定位到第3条，否则定位到最后一条
+      const len = labels.length;
+      const initialIndex = len >= 3 ? 2 : (len > 0 ? len - 1 : -1);
+      const initialValue = initialIndex >= 0 ? [labels[initialIndex].value] : [];
+      const initialLabel = initialIndex >= 0 ? labels[initialIndex].label : '请选择角色';
       this.setData({
         roleOptions: labels,
-        rolePickerValue: (labels[0] ? [labels[0].value] : []),
-        roleLabel: labels[0] ? labels[0].label : '请选择角色'
+        rolePickerValue: initialValue,
+        roleLabel: initialLabel
       }, () => {
-        console.log('after setData roleOptions:', this.data.roleOptions);
-        console.log('after setData rolePickerValue:', this.data.rolePickerValue);
-        console.log('after setData roleLabel:', this.data.roleLabel);
         if (!this.data.roleOptions.length) {
           wx.showToast({ title: '角色数据为空', icon: 'none' });
         }
       });
-      console.log(this.data.roleOptions)
-      
     }).catch((err) => {
-      console.error('加载失败:', err);
     })
   },
   onNicknameChange(e) {
@@ -183,7 +174,6 @@ Page({
     });
   },
   onRoleChange(e) {
-    console.log('onRoleChange detail:', e.detail);
     const {
       value,
       label
@@ -194,11 +184,15 @@ Page({
     });
   },
   onRoleConfirm(e) {
-    console.log('onRoleConfirm detail:', e.detail);
     const { value, label } = e.detail || {};
     this.setData({
       rolePickerValue: value || this.data.rolePickerValue,
       roleLabel: (label && label[0]) || this.data.roleLabel
+    });
+  },
+  onFamilyNameChange(e) {
+    this.setData({
+      familyName: e.detail.value || ''
     });
   },
   onChooseAvatar(e) {
@@ -245,39 +239,84 @@ Page({
       });
       return;
     }
+    if (this.data.createMode && !this.data.familyName) {
+      wx.showToast({
+        title: '请输入家庭名称',
+        icon: 'none'
+      });
+      return;
+    }
     this.setData({
       saving: true
     });
     const api = require('../../api.js').default || require('../../api.js');
-    api.updateUser({
-      userRoleName: roleName,
-      userName: nickname
-    }).then(() => {
-      const localAvatarPath = wx.getStorageSync('localAvatarPath') || '';
-      wx.setStorageSync('profile', {
-        roleName,
-        nickname,
-        avatarLocal: localAvatarPath
+    const token = wx.getStorageSync('token') || '';
+    console.log(token)
+    const homeCode = this.data.code || '';
+    // 创建家庭与加入家庭分支
+    if (this.data.createMode) {
+      // 创建家庭
+      api.createHome(token, this.data.familyName).then(() => {
+        const localAvatarPath = wx.getStorageSync('localAvatarPath') || '';
+        wx.setStorageSync('profile', {
+          roleName,
+          nickname,
+          avatarLocal: localAvatarPath,
+          familyName: this.data.familyName
+        });
+        wx.showToast({ title: '家庭创建成功' });
+        this.setData({ showSheet: false, saving: false });
+        wx.navigateTo({ url: '/pages/roleSetting/roleSetting' });
+      }).catch(err => {
+        this.setData({ saving: false });
+        wx.showToast({
+          title: (err && err.message) || '创建家庭失败',
+          icon: 'none'
+        });
       });
-      wx.showToast({
-        title: '已保存'
+    } else {
+      api.userJoinHome({
+        token,
+        homeCode,
+        userRole: roleName,
+        userName: nickname
+      }).then((res) => {
+        if (res && typeof res.code !== 'undefined' && res.code !== 0) {
+          this.setData({
+            saving: false
+          });
+          wx.showToast({
+            title: res.message || '加入失败',
+            icon: 'none'
+          });
+          return;
+        }
+        const localAvatarPath = wx.getStorageSync('localAvatarPath') || '';
+        wx.setStorageSync('profile', {
+          roleName,
+          nickname,
+          avatarLocal: localAvatarPath
+        });
+        wx.showToast({
+          title: '已保存'
+        });
+        this.setData({
+          showSheet: false,
+          saving: false
+        });
+        // 继续加入家庭流程
+        wx.navigateTo({
+          url: '/pages/roleSetting/roleSetting'
+        });
+      }).catch(err => {
+        this.setData({
+          saving: false
+        });
+        wx.showToast({
+          title: (err && err.message) || '保存失败',
+          icon: 'none'
+        });
       });
-      this.setData({
-        showSheet: false,
-        saving: false
-      });
-      // 继续加入家庭流程
-      wx.navigateTo({
-        url: '/pages/roleSetting/roleSetting'
-      });
-    }).catch(err => {
-      this.setData({
-        saving: false
-      });
-      wx.showToast({
-        title: (err && err.message) || '保存失败',
-        icon: 'none'
-      });
-    });
+    }
   }
 });

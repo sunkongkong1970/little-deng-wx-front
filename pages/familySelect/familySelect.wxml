@@ -1,34 +1,40 @@
 <view class="page">
-	<view class="join-row">
-		<t-input value="{{code}}" placeholder="请输入家庭邀请码" bindchange="onCodeChange" />
-		<t-button block disabled="{{!canJoin}}" bindtap="onJoin">加入家庭</t-button>
-	</view>
-	<view class="add-row">
-		<t-button theme="primary" block bindtap="onAdd">添加家庭</t-button>
-	</view>
+  <view class="join-row">
+    <t-input value="{{code}}" placeholder="请输入家庭邀请码" bindchange="onCodeChange" />
+    <t-button block disabled="{{!canJoin}}" bindtap="onJoin">加入家庭</t-button>
+  </view>
+  <view class="add-row">
+    <t-button theme="primary" block bindtap="onAdd">创建家庭</t-button>
+  </view>
 
-	<t-popup visible="{{showSheet}}" placement="bottom" customStyle="height:50vh" bind:visible-change="onSheetVisibleChange">
-		<view class="sheet">
-			<view class="sheet-header">完善资料</view>
-			<view class="sheet-body">
-				<view class="avatar-row" bindtap="onChooseAvatar">
-					<t-avatar image="{{avatarUrl}}" size="72" shape="circle"></t-avatar>
-					<view class="avatar-text">点击更换头像</view>
-				</view>
-				<view class="field">
-					<view class="label">昵称</view>
-					<t-input value="{{nickname}}" placeholder="请输入昵称" bindchange="onNicknameChange" />
-				</view>
-				<view class="field">
-					<view class="label">角色</view>
-					<t-picker class="role-picker" value="{{rolePickerValue}}" keys="{{ { value: 'value', label: 'label' } }}" usePopup="{{false}}" header="{{false}}" cancelBtn="{{false}}" confirmBtn="{{false}}" bind:change="onRoleChange" bind:confirm="onRoleConfirm">
-						<t-picker-item options="{{roleOptions}}"></t-picker-item>
-					</t-picker>
-				</view>
-			</view>
-			<view class="sheet-footer">
-				<t-button block theme="primary" bindtap="onConfirmProfile" loading="{{saving}}">确定</t-button>
-			</view>
-		</view>
-	</t-popup>
+  <t-popup visible="{{showSheet}}" placement="bottom" customStyle="height:50vh" bind:visible-change="onSheetVisibleChange">
+    <view class="sheet">
+      <view class="sheet-header">完善资料</view>
+      <view class="sheet-body">
+       <!-- 创建家庭时增加家庭名称输入 -->
+       <view class="field" wx:if="{{createMode}}">
+          <view class="label">家庭名称</view>
+          <t-input value="{{familyName}}" placeholder="请输入家庭名称" bindchange="onFamilyNameChange" />
+        </view>
+        <view class="avatar-row" bindtap="onChooseAvatar">
+          <t-avatar image="{{avatarUrl}}" size="72" shape="circle"></t-avatar>
+          <view class="avatar-text">点击更换头像</view>
+        </view>
+        <view class="field">
+          <view class="label">昵称</view>
+          <t-input value="{{nickname}}" placeholder="请输入昵称" bindchange="onNicknameChange" />
+        </view>
+       
+        <view class="field">
+          <view class="label">角色</view>
+          <t-picker class="role-picker" value="{{rolePickerValue}}" keys="{{ { value: 'value', label: 'label' } }}" usePopup="{{false}}" bind:change="onRoleChange" bind:confirm="onRoleConfirm" header="{{false}}" cancelBtn="{{false}}" confirmBtn="{{false}}" show-toolbar="{{false}}" >
+            <t-picker-item options="{{roleOptions}}"></t-picker-item>
+          </t-picker>
+        </view>
+      </view>
+      <view class="sheet-footer">
+        <t-button block theme="primary" bindtap="onConfirmProfile" loading="{{saving}}">确定</t-button>
+      </view>
+    </view>
+  </t-popup>
 </view>

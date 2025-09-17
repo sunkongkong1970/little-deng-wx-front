@@ -51,27 +51,31 @@ Page({
       if (!code) {
         throw new Error('获取code失败');
       }
-
-      const res = await api.userLogin(code);
-
-      if (!res || res.code !== 0 || !res.data) {
-        this.setData({
-          authVisible: false
-        });
-        throw new Error(res?.message || '登录失败');
+      // 2. 登录换取 token
+      const loginData = await api.userLogin(code);
+      const token = loginData && loginData.token;
+      if (!token) {
+        this.setData({ authVisible: false });
+        throw new Error('登录失败');
       }
-
       // 3. 存储token
-      const {
-        token
-      } = res.data;
       wx.setStorageSync('token', token);
-      // 4. 获取用户信息并按家庭状态跳转
+      // 4. 获取用户信息
       const userRes = await api.getUserInfo(token);
-      if (!userRes || userRes.code !== 0 || !userRes.data) {
-        throw new Error(userRes?.message || '获取用户信息失败');
+      let user;
+      if (userRes && typeof userRes.code !== 'undefined') {
+        if (userRes.code !== 0) {
+          wx.showToast({ title: userRes.message || '获取用户信息失败', icon: 'none' });
+          this.setData({ authVisible: false });
+          return;
+        }
+        user = userRes.data;
+      } else {
+        user = userRes;
       }
-      const user = userRes.data;
+      if (!user) {
+        throw new Error('获取用户信息失败');
+      }
       wx.showToast({
         title: '登录成功'
       });
