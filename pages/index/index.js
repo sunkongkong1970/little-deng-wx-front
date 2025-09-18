@@ -18,12 +18,15 @@ Page({
     })
   },
   onChooseAvatar(e) {
+    console.log("1010101")
     const { avatarUrl } = e.detail
     const { nickName } = this.data.userInfo
     this.setData({
       "userInfo.avatarUrl": avatarUrl,
       hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
     })
+    console.log(avatarUrl)
+    console.log(nickName)
   },
   onInputChange(e) {
     const nickName = e.detail.value
@@ -40,6 +43,9 @@ Page({
       success: (res) => {
         console.log(11111)
         console.log(res)
+        console.log(res.userInfo)
+        console.log(res.userInfo)
+        console.log(res.userInfo.avatarUrl)
         this.setData({
           userInfo: res.userInfo,
           hasUserInfo: true

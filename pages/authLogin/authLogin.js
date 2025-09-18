@@ -3,9 +3,13 @@ Page({
   data: {
     authVisible: false,
     loading: false,
+    hasUserInfo: false,
+    canIUseGetUserProfile: wx.canIUse('getUserProfile'),
   },
   async onLoad() {
-    this.setData({ errorMsg: '' });
+    this.setData({
+      errorMsg: ''
+    });
     try {
       const token = wx.getStorageSync('token');
       if (token) {
@@ -26,19 +30,49 @@ Page({
         }
       }
     } catch (e) {
-    
+
     } finally {
       this.setData({
         loading: false
       });
     }
   },
-  onAuthorize() {
-    this.setData({
-      authVisible: true
-    });
+
+  //点击授权按钮后触发的回调
+  onGetUserProfile(e) {
+    wx.getUserProfile({
+      desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+      success: (res) => {
+        this.setData({
+          userInfo: res.userInfo,
+          hasUserInfo: true
+        })
+        console.log(res.userInfo)
+        const userInfo = res.userInfo;
+        // 2. 授权成功：提取用户信息并更新页面数据
+        this.setData({
+          userNickname: userInfo.nickName, // 昵称
+          avatarUrl:userInfo.avatarUrl
+        });
+        // 3. 缓存用户基础信息
+        wx.setStorageSync('nickname', userInfo.nickName || '');
+        wx.setStorageSync('avatarUrl', userInfo.avatarUrl || '');
+      // 完成后关闭对话框并继续登录流程
+      this.setData({ authVisible: false });
+      this.serverLogin();
+      },
+      fail: (err) => {
+        // 接口调用失败的逻辑（如网络错误、权限问题）
+        wx.showToast({
+          title: '未授权，无法获取昵称和头像',
+          icon: 'none',
+          duration: 1500
+        });
+      },
+    })
   },
-  async onConfirm() {
+
+  async serverLogin() {
     if (this.data.loading) return;
     this.setData({
       loading: true
@@ -55,7 +89,9 @@ Page({
       const loginData = await api.userLogin(code);
       const token = loginData && loginData.token;
       if (!token) {
-        this.setData({ authVisible: false });
+        this.setData({
+          authVisible: false
+        });
         throw new Error('登录失败');
       }
       // 3. 存储token
@@ -65,8 +101,13 @@ Page({
       let user;
       if (userRes && typeof userRes.code !== 'undefined') {
         if (userRes.code !== 0) {
-          wx.showToast({ title: userRes.message || '获取用户信息失败', icon: 'none' });
-          this.setData({ authVisible: false });
+          wx.showToast({
+            title: userRes.message || '获取用户信息失败',
+            icon: 'none'
+          });
+          this.setData({
+            authVisible: false
+          });
           return;
         }
         user = userRes.data;
@@ -76,6 +117,7 @@ Page({
       if (!user) {
         throw new Error('获取用户信息失败');
       }
+
       wx.showToast({
         title: '登录成功'
       });
@@ -103,15 +145,5 @@ Page({
         loading: false
       });
     }
-  },
-  onCancel() {
-    this.setData({
-      authVisible: false
-    });
-    const toast = this.selectComponent('#toast');
-    toast?.show?.({
-      theme: 'error',
-      message: '请授权以继续使用小程序'
-    });
   }
 });

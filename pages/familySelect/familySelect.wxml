@@ -11,23 +11,25 @@
     <view class="sheet">
       <view class="sheet-header">完善资料</view>
       <view class="sheet-body">
-       <!-- 创建家庭时增加家庭名称输入 -->
-       <view class="field" wx:if="{{createMode}}">
+        <view class="avatar-row">
+          <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+            <image class="avatar" src="{{userInfo.localAvatarUrl || '/assets/default.png'}}"></image>
+          </button>
+          <block wx:if="{{!editingNickname}}">
+            <view class="avatar-nickname" bindtap="onNicknameTap">{{ userInfo.nickName || '点击填写昵称' }}</view>
+          </block>
+          <block wx:else>
+            <t-input class="avatar-nickname-input" value="{{userInfo.nickName}}" placeholder="请输入昵称" focus="{{true}}" bindchange="onNicknameChange" bindblur="onNicknameBlur" />
+          </block>
+        </view>
+        <!-- 创建家庭时增加家庭名称输入 -->
+        <view class="field" wx:if="{{createMode}}">
           <view class="label">家庭名称</view>
           <t-input value="{{familyName}}" placeholder="请输入家庭名称" bindchange="onFamilyNameChange" />
         </view>
-        <view class="avatar-row" bindtap="onChooseAvatar">
-          <t-avatar image="{{avatarUrl}}" size="72" shape="circle"></t-avatar>
-          <view class="avatar-text">点击更换头像</view>
-        </view>
         <view class="field">
-          <view class="label">昵称</view>
-          <t-input value="{{nickname}}" placeholder="请输入昵称" bindchange="onNicknameChange" />
-        </view>
-       
-        <view class="field">
-          <view class="label">角色</view>
-          <t-picker class="role-picker" value="{{rolePickerValue}}" keys="{{ { value: 'value', label: 'label' } }}" usePopup="{{false}}" bind:change="onRoleChange" bind:confirm="onRoleConfirm" header="{{false}}" cancelBtn="{{false}}" confirmBtn="{{false}}" show-toolbar="{{false}}" >
+          <view class="label">您的角色</view>
+          <t-picker class="role-picker" value="{{rolePickerValue}}" keys="{{ { value: 'value', label: 'label' } }}" usePopup="{{false}}" bind:change="onRoleChange" header="{{false}}" cancelBtn="{{false}}" confirmBtn="{{false}}" show-toolbar="{{false}}">
             <t-picker-item options="{{roleOptions}}"></t-picker-item>
           </t-picker>
         </view>

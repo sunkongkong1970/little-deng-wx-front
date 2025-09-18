@@ -1,5 +1,6 @@
 {
   "pages": [
+    
     "pages/authLogin/authLogin",
     "pages/familySelect/familySelect",
     "pages/roleSetting/roleSetting",
@@ -7,7 +8,9 @@
     "pages/apps/apps",
     "pages/moment/moment",
     "pages/mine/mine",
-    "pages/inviteCode/inviteCode"
+    "pages/inviteCode/inviteCode",
+    "pages/index/index"
+    
   ],
   "tabBar": {
     "color": "#666666",

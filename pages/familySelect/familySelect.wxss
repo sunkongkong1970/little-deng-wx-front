@@ -34,14 +34,30 @@
 
 .avatar-row {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
   gap: 12px;
-  margin-bottom: 12px
+  margin: 12px 0 20px 0
 }
 
 .avatar-text {
-  color: #666
+  color: #666;
+  font-size: 12px
+}
+
+.avatar-nickname {
+  margin-top: 2px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #222
+}
+
+.avatar-nickname-input {
+  width: 70%;
+  min-width: 200px
 }
 
 .field {
@@ -78,4 +94,22 @@ page .t-picker__toolbar {
   height: 0 !important;
   padding: 0 !important;
   margin: 0 !important
+}
+.avatar-row t-avatar { border-radius: 50%; overflow: hidden; }
+.avatar {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.avatar-wrapper {
+  background: transparent;
+  padding: 0;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
 }
