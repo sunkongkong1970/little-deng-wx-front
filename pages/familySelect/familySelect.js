@@ -19,6 +19,9 @@ Page({
     },
   },
   onLoad() {
+    //判断user
+
+
     const cachedNickname = wx.getStorageSync('nickname') || '';
     const cachedAvatarPath = wx.getStorageSync('localAvatarPath') || wx.getStorageSync('localAvatarUrl') || wx.getStorageSync('avatarUrl') || '';
     const update = { "userInfo.nickName": cachedNickname };
@@ -291,24 +294,32 @@ Page({
       });
       return;
     }
+    
+    // 获取头像的base64字符串
+    let avatarBase64 = '';
+    const avatarPath = this.data.userInfo.localAvatarUrl || this.data.userInfo.avatarUrl;
+    if (avatarPath && (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH))) {
+      try {
+        const fs = wx.getFileSystemManager();
+        const fileContent = fs.readFileSync(avatarPath, 'base64');
+        if (fileContent) {
+          avatarBase64 = fileContent;
+        }
+      } catch (err) {
+        console.error('读取头像文件失败:', err);
+      }
+    }
+    
     this.setData({
       saving: true
     });
     const api = require('../../api.js').default || require('../../api.js');
     const token = wx.getStorageSync('token') || '';
-    console.log(token)
     const homeCode = this.data.code || '';
     // 创建家庭与加入家庭分支
     if (this.data.createMode) {
       // 创建家庭
-      api.createHome(token, this.data.familyName).then(() => {
-        const localAvatarPath = this.data.userInfo.localAvatarUrl || wx.getStorageSync('localAvatarPath') || '';
-        wx.setStorageSync('profile', {
-          roleName,
-          nickname,
-          avatarLocal: localAvatarPath,
-          familyName: this.data.familyName
-        });
+      api.createHome(token, this.data.rolePickerValue[0], this.data.userInfo.nickName, this.data.familyName, avatarBase64).then(() => {
         wx.showToast({ title: '家庭创建成功' });
         this.setData({ showSheet: false, saving: false });
         wx.navigateTo({ url: '/pages/roleSetting/roleSetting' });
@@ -320,12 +331,13 @@ Page({
         });
       });
     } else {
-      api.userJoinHome({
+      api.userJoinHome(
         token,
+        this.data.rolePickerValue[0],
+        this.data.userInfo.nickName,
         homeCode,
-        userRole: roleName,
-        userName: nickname
-      }).then((res) => {
+        avatarBase64
+      ).then((res) => {
         if (res && typeof res.code !== 'undefined' && res.code !== 0) {
           this.setData({
             saving: false
@@ -351,7 +363,7 @@ Page({
         });
         // 继续加入家庭流程
         wx.navigateTo({
-          url: '/pages/roleSetting/roleSetting'
+          url: '/pages/baby/baby'
         });
       }).catch(err => {
         this.setData({

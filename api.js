@@ -1,72 +1,93 @@
 import config from './env.js';
 // 封装通用的请求方法
-function request(url, method = 'GET', data = {},params = {}) {
-   // 处理查询参数
-   const queryStr = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-   const requestUrl = queryStr ? `${config.apiBaseUrl + url}?${queryStr}` : config.apiBaseUrl + url;
+function request(url, method = 'GET', data = {}, params = {}) {
+  // 处理查询参数
+  const queryStr = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
+  const requestUrl = queryStr ? `${config.apiBaseUrl + url}?${queryStr}` : config.apiBaseUrl + url;
 
-    return new Promise((resolve, reject) => {
-        wx.request({
-            url: requestUrl,
-            method: method,
-            data: data,
-            header: {
-                'Content-Type': 'application/json',
-                // 携带本地 token（兼容多种后端读取方式）
-                ...(wx.getStorageSync('token') ? {
-                    'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-                    'token': wx.getStorageSync('token'),
-                    'X-Token': wx.getStorageSync('token')
-                } : {})
-            },
-            success: (res) => {
-                if (res.statusCode === 200) {
-                    const body = res.data;
-                    if (body && typeof body === 'object' && Object.prototype.hasOwnProperty.call(body, 'code')) {
-                        if (body.code === 0) {
-                            // 业务成功：优先返回 data，否则返回整个 body
-                            resolve(typeof body.data === 'undefined' ? body : body.data);
-                        } else {
-                            const message = (body && (body.message || body.msg || body.error)) || '业务异常';
-                            const error = new Error(`[${body.code}] ${message}`);
-                            error.code = body.code;
-                            error.response = body;
-                            reject(error);
-                        }
-                    } else {
-                        // 未按约定返回 code 字段，则原样返回
-                        resolve(body);
-                    }
-                } else {
-                    const serverMsg = (res.data && (res.data.message || res.data.msg || res.data.error)) || '';
-                    const errMsg = serverMsg || `请求失败，状态码: ${res.statusCode}`;
-                    reject(new Error(errMsg));
-                }
-            },
-            fail: (err) => {
-                const errMsg = err && (err.errMsg || err.message) ? (err.errMsg || err.message) : '网络异常，请稍后重试';
-                reject(new Error(errMsg));
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: requestUrl,
+      method: method,
+      data: data,
+      header: {
+        'Content-Type': 'application/json',
+        // 携带本地 token（兼容多种后端读取方式）
+        ...(wx.getStorageSync('token') ? {
+          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+          'token': wx.getStorageSync('token'),
+          'X-Token': wx.getStorageSync('token')
+        } : {})
+      },
+      success: (res) => {
+        if (res.statusCode === 200) {
+          const body = res.data;
+          if (body && typeof body === 'object' && Object.prototype.hasOwnProperty.call(body, 'code')) {
+            if (body.code === 0) {
+              // 业务成功：优先返回 data，否则返回整个 body
+              resolve(typeof body.data === 'undefined' ? body : body.data);
+            } else {
+              const message = (body && (body.message || body.msg || body.error)) || '业务异常';
+              const error = new Error(`[${body.code}] ${message}`);
+              error.code = body.code;
+              error.response = body;
+              reject(error);
             }
-        });
+          } else {
+            // 未按约定返回 code 字段，则原样返回
+            resolve(body);
+          }
+        } else {
+          const serverMsg = (res.data && (res.data.message || res.data.msg || res.data.error)) || '';
+          const errMsg = serverMsg || `请求失败，状态码: ${res.statusCode}`;
+          reject(new Error(errMsg));
+        }
+      },
+      fail: (err) => {
+        const errMsg = err && (err.errMsg || err.message) ? (err.errMsg || err.message) : '网络异常，请稍后重试';
+        reject(new Error(errMsg));
+      }
     });
+  });
 }
 // 定义具体的API请求方法
 const api = {
-    // 登录
-    userLogin: (code) => request('/api/wechat/login','POST',{}, { code }),
-    // 获取用户信息
-    getUserInfo: (token) => request('/api/user/token','POST',{}, { token }),
-    // 加入家庭
-    joinHome:(token,homeCode) => request('/api/','POST',{}, { token, homeCode}),
-    // 创建家庭
-    createHome:(token, homeName) => request('/api/home/createHome','POST',{token, homeName}, {}),
-    // 角色选项（下拉框）
-    getRoleOptions: (type) => request('/api/dict/dictList','GET',{type}),
+  // 登录
+  userLogin: (code) => request('/api/wechat/login', 'POST', {}, {
+    code
+  }),
+  // 获取用户信息
+  getUserInfo: (token) => request('/api/user/token', 'POST', {}, {
+    token
+  }),
+  // 加入家庭
+  joinHome: (token, homeCode) => request('/api/', 'POST', {}, {
+    token,
+    homeCode
+  }),
+  // 创建家庭
+  createHome: (token, userRole, userName, homeName, avatarBase64 = '') => request('/api/home/createHome', 'POST', {
+    token,
+    userRole,
+    userName,
+    homeName,
+    avatarBase64
+  }, {}),
+  // 角色选项（下拉框）
+  getRoleOptions: (type) => request('/api/dict/dictList', 'GET', {
+    type
+  }),
 
-    // 更新用户资料（角色与昵称）
-    userJoinHome: ({ token,userRole, userName,homeCode }) => request('/api/user/joinHome','POST', { token,userRole, userName,homeCode }),
+  // 更新用户资料（角色与昵称）
+  userJoinHome: (token, userRole, userName, homeCode, avatarBase64 = '') => request('/api/user/joinHome', 'POST', {
+    token,
+    userRole,
+    userName,
+    homeCode,
+    avatarBase64
+  }, {}),
 
-    // 提交表单数据
-    submitForm: (formData) => request('/form/submit', 'POST', formData)
+  // 提交表单数据
+  submitForm: (formData) => request('/form/submit', 'POST', formData)
 };
 export default api;
