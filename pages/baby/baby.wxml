@@ -1,19 +1,22 @@
 <view class="page">
-	<block wx:if="{{!hasBaby}}">
-		<view class="empty">
-			<view class="hint">添加宝宝</view>
-			<view class="dashed" bindtap="onAddBaby">+
-			</view>
-		</view>
-	</block>
-	<block wx:else>
-		<view class="filled">
-			<t-image width="200" height="200" src="/assets/sample-baby.jpg" mode="aspectFill" />
-			<view class="info">
-				<text class="name">小暖</text>
-				<text class="meta">女宝 · 2024-05-01</text>
-			</view>
-			<view class="edit" bindtap="onEdit">编辑</view>
-		</view>
-	</block>
+  <!-- 隐藏的canvas用于颜色检测 -->
+  <canvas type="2d" id="color-detector" style="width: 100rpx; height: 100rpx; position: absolute; left: -200rpx;"></canvas>
+  
+  <!-- 宝宝卡片区域 -->
+  <view class="cards-container">
+    <block wx:if="{{hasBaby}}">
+      <t-card class="baby-card">
+        <view slot="cover" class="baby-card-cover">
+          <t-image class="baby-image" src="/assets/baby.png" mode="aspectFill" bindload="onImageLoad" />
+          <text class="baby-name-floating" style="color: {{textColor}}">小暖</text>
+        </view>
+      </t-card>
+    </block>
+    
+    <!-- 添加宝宝卡片 -->
+    <view class="add-baby-card" bindtap="onAddBaby">
+      <view class="add-icon">+</view>
+      <text class="add-text">添加宝宝</text>
+    </view>
+  </view>
 </view>

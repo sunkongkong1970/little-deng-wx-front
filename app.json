@@ -5,6 +5,7 @@
     "pages/familySelect/familySelect",
     "pages/roleSetting/roleSetting",
     "pages/baby/baby",
+    "pages/babyAdd/babyAdd",
     "pages/apps/apps",
     "pages/moment/moment",
     "pages/mine/mine",
@@ -60,7 +61,9 @@
     "t-tag": "miniprogram_npm/tdesign-miniprogram/tag/tag",
     "t-popup": "miniprogram_npm/tdesign-miniprogram/popup/popup",
     "t-picker": "miniprogram_npm/tdesign-miniprogram/picker/picker",
-    "t-picker-item": "miniprogram_npm/tdesign-miniprogram/picker-item/picker-item"
+    "t-picker-item": "miniprogram_npm/tdesign-miniprogram/picker-item/picker-item",
+    "t-icon": "miniprogram_npm/tdesign-miniprogram/icon/icon",
+    "t-textarea": "miniprogram_npm/tdesign-miniprogram/textarea/textarea"
   },
   "window": {
     "navigationBarTextStyle": "black",

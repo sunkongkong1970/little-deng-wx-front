@@ -1,0 +1,234 @@
+.page {
+  padding: 0 30rpx 30rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 页面标题 */
+.page-title {
+  text-align: center;
+  padding: 30rpx 0;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 头像上传区域 */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin: 20rpx 0 40rpx;
+}
+
+.avatar-upload {
+  width: 680rpx;
+  height: 380rpx;
+  border-radius: 24rpx;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 2rpx dashed #e0e0e0;
+}
+
+.avatar-upload image,
+.avatar-upload t-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24rpx;
+}
+
+/* 头像图片样式 */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24rpx;
+}
+
+/* 占位图片样式 */
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24rpx;
+  background-color: #f5f5f5;
+}
+
+/* 占位内容样式 */
+.placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #999;
+  background-color: #f5f5f5;
+  border-radius: 24rpx;
+}
+
+.upload-tip {
+  font-size: 32rpx;
+  color: #999;
+  margin-top: 20rpx;
+}
+
+.avatar-upload:active {
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+  transform: scale(0.98);
+  border-color: #07C160;
+}
+
+/* 表单容器 */
+.form-container {
+  margin-bottom: 30rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+  background-color: white;
+}
+
+/* 表单项目 */
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  min-height: 100rpx;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-item:active {
+  background-color: #f8f8f8;
+}
+
+/* 表单标签 */
+.form-label {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+  min-width: 160rpx;
+  flex-shrink: 0;
+}
+
+/* 表单内容区域 */
+.form-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* 输入框 */
+.form-input {
+  width: 100%;
+  font-size: 32rpx;
+  color: #333;
+  text-align: right;
+}
+
+/* 性别选择 */
+.gender-group {
+  display: flex;
+  gap: 40rpx;
+  align-items: center;
+  margin-right: auto;
+}
+
+.gender-radio {
+  font-size: 32rpx;
+}
+
+/* 日期选择器 */
+.picker-text {
+  color: #666;
+  font-size: 32rpx;
+}
+
+/* 宝宝描述容器 */
+.description-container {
+  margin-bottom: 30rpx;
+  border-radius: 20rpx;
+  background-color: white;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* 描述头部 */
+.description-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx 32rpx 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.description-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.word-count {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 描述内容区域 */
+.description-content {
+  padding: 20rpx 32rpx 32rpx;
+}
+
+/* 描述输入框 */
+.description-textarea {
+  width: 100%;
+  min-height: 200rpx;
+  font-size: 32rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 底部按钮 */
+.footer {
+  margin-top: 60rpx;
+  display: flex;
+  gap: 20rpx;
+  padding: 0 10rpx;
+}
+
+.cancel-btn,
+.submit-btn {
+  flex: 1;
+  height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  line-height: 96rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.cancel-btn {
+  background-color: white;
+  color: #666;
+  border: 1rpx solid #e0e0e0;
+}
+
+.submit-btn {
+  background-color: #07C160;
+  color: white;
+  font-weight: 500;
+}
+
+.submit-btn:active {
+  background-color: #05a850;
+}
