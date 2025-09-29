@@ -19,4 +19,18 @@
       <text class="add-text">添加宝宝</text>
     </view>
   </view>
+  
+  <!-- 登录弹窗 -->
+  <view class="auth-mask" wx:if="{{authVisible}}" bindtap="closeAuth">
+    <view class="auth-modal" catchtap="stopPropagation">
+      <view class="brand">
+        <t-image src="/assets/default.png" width="80" height="80" shape="round" />
+        <text class="slogan">欢迎使用 成长日记 小程序，登录后即可管理家庭与宝宝信息</text>
+      </view>
+      <view class="actions">
+        <t-button wx:if="{{canIUseGetUserProfile}}" bindtap="onGetUserProfile">微信授权登录</t-button>
+      </view>
+    </view>
+  </view>
+  <t-toast id="toast" />
 </view>

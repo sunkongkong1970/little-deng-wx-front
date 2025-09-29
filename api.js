@@ -20,6 +20,7 @@ function request(url, method = 'GET', data = {}, params = {}) {
         } : {})
       },
       success: (res) => {
+        console.log(res)
         if (res.statusCode === 200) {
           const body = res.data;
           if (body && typeof body === 'object' && Object.prototype.hasOwnProperty.call(body, 'code')) {

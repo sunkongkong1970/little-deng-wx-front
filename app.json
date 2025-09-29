@@ -1,18 +1,16 @@
 {
   "pages": [
-    
-    "pages/authLogin/authLogin",
+    "pages/baby/baby",
     "pages/familySelect/familySelect",
     "pages/roleSetting/roleSetting",
-    "pages/baby/baby",
     "pages/babyAdd/babyAdd",
     "pages/apps/apps",
     "pages/moment/moment",
     "pages/mine/mine",
     "pages/inviteCode/inviteCode",
+    "pages/authLogin/authLogin",
     "pages/index/index",
     "pages/image-cropper/image-cropper"
-    
   ],
   "tabBar": {
     "color": "#666666",

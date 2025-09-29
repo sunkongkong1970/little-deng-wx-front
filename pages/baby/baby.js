@@ -1,14 +1,156 @@
+import api from '../../api.js';
+
 Page({
   data: {
     hasBaby: true,
-    textColor: '#ffffff'
+    textColor: '#ffffff',
+    authVisible: false,
+    loading: false,
+    hasUserInfo: false,
+    canIUseGetUserProfile: wx.canIUse('getUserProfile'),
+    errorMsg: ''
   },
 
-  onLoad() {},
+  async onLoad() {
+    this.setData({
+      errorMsg: ''
+    });
+    try {
+      const token = wx.getStorageSync('token');
+      if (token) {
+        const res = await api.getUserInfo(token);
+        console.log(res)
+        if (!res) {
+          throw new Error(res?.message || '获取用户信息失败');
+        }
+        // 用户已登录，不需要显示登录弹窗
+      } else {
+        // 用户未登录，显示登录弹窗
+        this.setData({
+          authVisible: true
+        });
+      }
+    } catch (e) {
+      console.error('登录检查失败:', e);
+      this.setData({
+        authVisible: true
+      });
+    } finally {
+      this.setData({
+        loading: false
+      });
+    }
+  },
+
+  // 关闭登录弹窗
+  closeAuth() {
+    this.setData({
+      authVisible: false
+    });
+  },
+
+  // 阻止事件冒泡
+  stopPropagation() {
+    // 防止点击弹窗内容时触发mask的点击事件
+  },
 
   onShow() {
     // 从添加宝宝页面返回时，可以在这里刷新数据
     // 实际项目中可能需要从缓存或服务器获取最新状态
+  },
+
+  //点击授权按钮后触发的回调
+  onGetUserProfile(e) {
+    wx.getUserProfile({
+      desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+      success: (res) => {
+        this.setData({
+          userInfo: res.userInfo,
+          hasUserInfo: true
+        })
+        console.log(res.userInfo)
+        const userInfo = res.userInfo;
+        // 2. 授权成功：提取用户信息并更新页面数据
+        this.setData({
+          userNickname: userInfo.nickName, // 昵称
+          avatarUrl: userInfo.avatarUrl
+        });
+        // 3. 缓存用户基础信息
+        wx.setStorageSync('nickname', userInfo.nickName || '');
+        wx.setStorageSync('avatarUrl', userInfo.avatarUrl || '');
+        // 完成后继续登录流程
+        this.serverLogin();
+      },
+      fail: (err) => {
+        // 接口调用失败的逻辑（如网络错误、权限问题）
+        wx.showToast({
+          title: '未授权，无法获取昵称和头像',
+          icon: 'none',
+          duration: 1500
+        });
+      },
+    })
+  },
+
+  async serverLogin() {
+    if (this.data.loading) return;
+    this.setData({
+      loading: true
+    });
+    try {
+      // 1. 获取登录凭证code
+      const {
+        code
+      } = await wx.login();
+      if (!code) {
+        throw new Error('获取code失败');
+      }
+      // 2. 登录换取 token
+      const loginData = await api.userLogin(code);
+      const token = loginData && loginData.token;
+      console.log("000   "+token)
+      if (!token) {
+        throw new Error('登录失败');
+      }
+      // 3. 存储token
+      wx.setStorageSync('token', token);
+      // 4. 获取用户信息
+      const userRes = await api.getUserInfo(token);
+      let user;
+      if (userRes && typeof userRes.code !== 'undefined') {
+        if (userRes.code !== 0) {
+          wx.showToast({
+            title: userRes.message || '获取用户信息失败',
+            icon: 'none'
+          });
+          return;
+        }
+        user = userRes.data;
+      } else {
+        user = userRes;
+      }
+      if (!user) {
+        throw new Error('获取用户信息失败');
+      }
+
+      wx.showToast({
+        title: '登录成功'
+      });
+      this.setData({
+        authVisible: false
+      });
+
+    } catch (err) {
+      console.error('登录失败:', err);
+      wx.showToast({
+        title: err.message || '登录失败',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({
+        loading: false
+      });
+    }
   },
 
   onAddBaby() {
