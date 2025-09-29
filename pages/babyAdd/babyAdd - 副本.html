@@ -57,7 +57,7 @@
     <view class="form-item">
       <view class="form-label">宝宝姓名</view>
       <view class="form-content">
-        <t-input class="form-input" placeholder="请输入宝宝姓名" placeholder-style="color: #999" bindchange="onNameInput" value="{{babyInfo.name}}" />
+        <t-input class="form-input" placeholder="请输入宝宝姓名" placeholder-style="color: #999" bind:input="onNameInput" value="{{babyInfo.name}}" />
       </view>
     </view>
 
@@ -65,7 +65,7 @@
     <view class="form-item">
       <view class="form-label">宝宝昵称</view>
       <view class="form-content">
-        <t-input class="form-input" placeholder="请输入宝宝昵称" placeholder-style="color: #999" bindchange="onNickNameInput" value="{{babyInfo.nickName}}" />
+        <t-input class="form-input" placeholder="请输入宝宝昵称" placeholder-style="color: #999" bindinput="onNickNameInput" value="{{babyInfo.nickName}}" />
       </view>
     </view>
 

@@ -154,9 +154,17 @@ Page({
   },
 
   onAddBaby() {
-    wx.navigateTo({
-      url: '/pages/babyAdd/babyAdd'
-    })
+    const token = wx.getStorageSync('token');
+    if(token){
+      wx.navigateTo({
+        url: '/pages/babyAdd/babyAdd'
+      })
+    }else{
+      this.setData({
+        authVisible: true
+      });
+    }
+    
   },
 
   onEdit() {

@@ -78,6 +78,48 @@ const api = {
   getRoleOptions: (type) => request('/api/dict/dictList', 'GET', {
     type
   }),
+  // 上传图片（通过POST请求）
+  uploadImage: (token, typeEnum, image) => request('/api/image/upload', 'POST', {
+    token,
+    typeEnum,
+    image
+  }, {}),
+
+  // 上传图片文件（通过wx.uploadFile）
+  uploadImageFile: (token, typeEnum, filePath) => {
+    return new Promise((resolve, reject) => {
+      wx.uploadFile({
+        url: config.apiBaseUrl + '/api/image/upload',
+        filePath: filePath,
+        name: 'image',
+        formData: {
+          token: token,
+          typeEnum: typeEnum
+        },
+        header: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+          'X-Token': token
+        },
+        success: (res) => {
+          try {
+            const data = JSON.parse(res.data);
+            if (data.code === 0 && data.data) {
+              console.log('上传成功，返回的图片路径:', data.data);
+              resolve(data.data);
+            } else {
+              reject(new Error(data.message || '上传失败'));
+            }
+          } catch (e) {
+            reject(new Error('解析返回数据失败'));
+          }
+        },
+        fail: (err) => {
+          reject(err);
+        }
+      });
+    });
+  },
 
   // 更新用户资料（角色与昵称）
   userJoinHome: (token, userRole, userName, homeCode, avatarBase64 = '') => request('/api/user/joinHome', 'POST', {

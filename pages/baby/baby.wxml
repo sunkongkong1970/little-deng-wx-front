@@ -8,7 +8,7 @@
       <t-card class="baby-card">
         <view slot="cover" class="baby-card-cover">
           <t-image class="baby-image" src="/assets/baby.png" mode="aspectFill" bindload="onImageLoad" />
-          <text class="baby-name-floating" style="color: {{textColor}}">小暖</text>
+          <text class="baby-name-floating" style="color: {{textColor}}">小宝</text>
         </view>
       </t-card>
     </block>

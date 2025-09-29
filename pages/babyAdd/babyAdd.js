@@ -1,17 +1,18 @@
 const app = getApp();
 const WeCropper = require('we-cropper');
+import api from '../../api.js';
+import config from '../../env.js';
 
 Page({
   data: {
     babyInfo: {
       name: '',
+      nickName:'',
       gender: '',
       birthday: '',
-      avatar: '',
       description: '',
       avatarOriginal: '', // 存储原始图片路径
       avatarCropped: '', // 存储裁剪后图片路径
-      avatarOriginalTmp: '', // 存储原始图片路径
       avatarCroppedTmp: '' // 存储裁剪后图片路径
     },
     genderOptions: [{
@@ -53,8 +54,8 @@ Page({
   // 获取裁剪尺寸
   getCropSize() {
     const systemInfo = wx.getWindowInfo()
-    const width = 680 / 750 * systemInfo.windowWidth
-    const height = 380 / 750 * systemInfo.windowWidth
+    const width = 700 / 750 * systemInfo.windowWidth
+    const height = 400 / 750 * systemInfo.windowWidth
     return {
       width,
       height
@@ -217,6 +218,12 @@ Page({
     });
   },
 
+  onNickNameInput(e) {
+    this.setData({
+      'babyInfo.nickName': e.detail.value
+    });
+  },
+
   onGenderChange(e) {
     this.setData({
       'babyInfo.gender': e.detail.value
@@ -339,9 +346,10 @@ Page({
 
 
 
-  onSubmit() {
+  async onSubmit() {
     const {
       name,
+      nickName,
       gender,
       birthday,
       description,
@@ -353,6 +361,14 @@ Page({
     if (!name.trim()) {
       wx.showToast({
         title: '请输入宝宝姓名',
+        icon: 'none'
+      });
+      return;
+    }
+
+    if (!nickName.trim()) {
+      wx.showToast({
+        title: '请输入宝宝昵称',
         icon: 'none'
       });
       return;
@@ -383,30 +399,48 @@ Page({
       return;
     }
 
-    // 有选择图片的情况下，同时上传原始图片和裁剪后的图片
-    if (avatarOriginal && avatarCropped) {
-      // 这里可以实现上传两张图片的逻辑
-      // 例如调用云函数或后端API上传图片
-      console.log('上传原始图片:', avatarOriginal);
-      console.log('上传裁剪后图片:', avatarCropped);
-
-      // 模拟上传成功
-      // 实际项目中应替换为真实的上传逻辑
-      // wx.uploadFile({...})
-    }
-
-    // 这里可以添加保存宝宝信息的逻辑
-    wx.showToast({
-      title: '添加成功',
-      icon: 'success',
-      duration: 2000,
-      success: () => {
-        // 返回上一页并刷新
-        setTimeout(() => {
-          wx.navigateBack();
-        }, 2000);
+    try {
+      // 获取token
+      const token = wx.getStorageSync('token');
+      if (!token) {
+        wx.showToast({
+          title: '请先登录',
+          icon: 'none'
+        });
+        return;
       }
-    });
+
+      // 有选择图片的情况下，上传图片
+      if (avatarOriginal && avatarCropped) {
+        // 调用api.js中的uploadImageFile方法上传图片
+        const uploadResultCropped = await api.uploadImageFile(token, 'BABY', avatarCropped);
+        const uploadResultOriginal = await api.uploadImageFile(token, 'BABY', avatarOriginal);
+        // 这里可以将返回的图片路径保存到babyInfo中
+        this.setData({
+          'babyInfo.avatarCropped': uploadResultCropped,
+          'babyInfo.avatarOriginal': uploadResultOriginal
+        });
+      }
+
+      // 这里可以添加保存宝宝信息的逻辑
+      wx.showToast({
+        title: '添加成功',
+        icon: 'success',
+        duration: 2000,
+        success: () => {
+          // 返回上一页并刷新
+          setTimeout(() => {
+            wx.navigateBack();
+          }, 2000);
+        }
+      });
+    } catch (error) {
+      console.error('上传图片失败:', error);
+      wx.showToast({
+        title: '上传图片失败',
+        icon: 'none'
+      });
+    }
   },
 
   onCancel() {
