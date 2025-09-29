@@ -1,0 +1,18 @@
+<view class="container">
+  <button bindtap="uploadImage" type="primary">选择图片</button>
+  <button bindtap="getCroppedImage">裁剪图片</button>
+
+  <view class="cropper-container">
+    <canvas 
+      id="cropper" 
+      canvas-id="cropper"
+      style="width: 680rpx; height: 380rpx;"
+      disable-scroll
+      bindtouchstart="touchStart"
+      bindtouchmove="touchMove"
+      bindtouchend="touchEnd"
+    ></canvas>
+  </view>
+
+  <image wx:if="{{croppedImage}}" src="{{croppedImage}}" mode="widthFix" style="width: 680rpx;"/>
+</view>

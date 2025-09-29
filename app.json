@@ -10,7 +10,8 @@
     "pages/moment/moment",
     "pages/mine/mine",
     "pages/inviteCode/inviteCode",
-    "pages/index/index"
+    "pages/index/index",
+    "pages/image-cropper/image-cropper"
     
   ],
   "tabBar": {

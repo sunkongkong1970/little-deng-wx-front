@@ -3,8 +3,8 @@
   <view class="avatar-section">
     <view class="avatar-upload" bindtap="onChooseAvatar">
       <t-image 
-        wx:if="{{babyInfo.avatar}}" 
-        src="{{babyInfo.avatar}}" 
+        wx:if="{{babyInfo.avatarCropped}}" 
+        src="{{babyInfo.avatarCropped}}" 
         mode="aspectFill" 
         class="avatar-image"
       />
@@ -19,6 +19,35 @@
           <text class="upload-tip">点击上传头像</text>
         </view>
       </t-image>
+    </view>
+  </view>
+
+  <!-- 裁剪界面 -->
+  <view wx:if="{{showCropper}}" class="cropper-overlay">
+    <view class="cropper-container">
+      <view class="cropper-header">
+        <text class="cropper-title">调整图片</text>
+      </view>
+      <image wx:if="{{babyInfo.avatarCroppedTmp}}" src="{{babyInfo.avatarCroppedTmp}}" mode="widthFix" style="width: 680rpx;"/>
+      <view class="cropper-wrapper">
+        <!-- we-cropper canvas -->
+        <canvas 
+          id="cropper" 
+          canvas-id="cropper"
+          style="width: 680rpx; height: 380rpx;"
+          disable-scroll
+          bindtouchstart="touchStart"
+          bindtouchmove="touchMove"
+          bindtouchend="touchEnd"
+        ></canvas>
+      </view>
+      
+      <view class="cropper-controls">
+        <view class="action-buttons">
+          <t-button class="cancel-btn" bindtap="cancelCrop" theme="default">取消</t-button>
+          <t-button class="confirm-btn" bindtap="getCroppedImage" theme="primary">确认</t-button>
+        </view>
+      </view>
     </view>
   </view>
 

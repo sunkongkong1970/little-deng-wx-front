@@ -88,6 +88,7 @@ Page({
       // 2. 登录换取 token
       const loginData = await api.userLogin(code);
       const token = loginData && loginData.token;
+      console.log("000   "+token)
       if (!token) {
         this.setData({
           authVisible: false

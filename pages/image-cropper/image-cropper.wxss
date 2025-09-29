@@ -1,0 +1,13 @@
+.container {
+  padding: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cropper-container {
+  margin: 30rpx 0;
+  width: 680rpx;
+  height: 380rpx;
+  border: 1rpx solid #eee;
+}

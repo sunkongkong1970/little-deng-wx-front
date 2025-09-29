@@ -232,3 +232,175 @@
 .submit-btn:active {
   background-color: #05a850;
 }
+
+/* 图片裁剪相关样式 */
+.image-cropper-modal {
+  width: 90%;
+  max-width: 800rpx;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+.image-cropper-container {
+  padding: 20rpx 0;
+}
+
+.preview-section {
+  margin-bottom: 30rpx;
+}
+
+.image-wrapper {
+  position: relative;
+  margin: 0 auto;
+  overflow: hidden;
+  background-color: #f8f8f8;
+  border-radius: 8rpx;
+}
+
+.selection-box {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.selection-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2rpx dashed #07C160;
+  background-color: rgba(7, 193, 96, 0.1);
+}
+
+.selection-handle {
+  position: absolute;
+  width: 24rpx;
+  height: 24rpx;
+  background-color: #07C160;
+  border: 4rpx solid white;
+  border-radius: 50%;
+}
+
+.selection-handle.top-left {
+  top: -12rpx;
+  left: -12rpx;
+}
+
+.selection-handle.top-right {
+  top: -12rpx;
+  right: -12rpx;
+}
+
+.selection-handle.bottom-left {
+  bottom: -12rpx;
+  left: -12rpx;
+}
+
+.selection-handle.bottom-right {
+  bottom: -12rpx;
+  right: -12rpx;
+}
+
+.cropper-tips {
+  text-align: center;
+  font-size: 28rpx;
+  color: #999;
+  margin-top: 20rpx;
+}
+
+.cropper-operations {
+  display: flex;
+  justify-content: center;
+  margin-top: 20rpx;
+}
+
+.reset-button {
+  background-color: white;
+  border: 1rpx solid #e0e0e0;
+  color: #666;
+  border-radius: 40rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  min-width: 200rpx;
+}
+
+/* 新的裁剪界面样式 */
+.cropper-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.cropper-container {
+  width: 700rpx;
+  height: 600rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.cropper-header {
+  width: 100%;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1rpx solid #eee;
+}
+
+.cropper-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.cropper-wrapper {
+  width: 100%;
+  height: 380rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-color: #f8f8f8;
+  margin: 30rpx 0;
+}
+
+.cropper-controls {
+  width: 100%;
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.action-buttons {
+  width: 100%;
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-buttons .cancel-btn,
+.action-buttons .confirm-btn {
+  flex: 1;
+  height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  line-height: 96rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
