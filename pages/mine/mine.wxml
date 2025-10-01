@@ -1,17 +1,101 @@
 <view class="page">
-	<view class="card">
-		<view class="row">
-			<t-avatar size="60"></t-avatar>
-			<view class="info">
-				<text class="nick">微信昵称</text>
-				<t-tag theme="primary" variant="light">爸爸</t-tag>
-			</view>
-			<text class="edit" bindtap="goProfile">✎</text>
-		</view>
-	</view>
-	<t-cell-group>
-		<t-cell title="修改个人资料" arrow bindtap="goProfile" />
-		<t-cell title="编辑宝宝简介" arrow />
-	</t-cell-group>
-	<view class="footer">关于我们 · 帮助中心</view>
+  <!-- 用户信息卡片 -->
+  <view class="card">
+    <view class="header-row">
+      <!-- 左侧：头像和信息 -->
+      <view class="user-section">
+        <image class="avatar" src="{{userInfo.localAvatarUrl || userInfo.avatarUrl}}" mode="aspectFill" />
+        <view class="info">
+          <view class="name-row">
+            <text class="nickname">{{userInfo.nickname}}</text>
+            <text class="edit-btn" bindtap="onEdit">编辑</text>
+          </view>
+          <view class="role-row">
+            <t-tag theme="primary" variant="light" size="small">{{userInfo.roleName}}</t-tag>
+            <t-tag wx:if="{{userInfo.isHouseholder}}" theme="success" variant="light" size="small">管理员</t-tag>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 右侧：邀请码按钮（仅管理员） -->
+      <view wx:if="{{userInfo.isHouseholder}}" class="invite-btn" bindtap="onShowInviteCode">
+        <t-icon name="user-add" size="20" />
+        <text class="invite-text">邀请码</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <t-cell-group>
+    <t-cell title="家庭管理" arrow />
+    <t-cell title="隐私设置" arrow />
+    <t-cell title="关于我们" arrow />
+  </t-cell-group>
+
+  <!-- 底部版权 -->
+  <view class="footer">成长日记 · 记录美好时光</view>
+
+  <!-- 编辑个人信息弹窗 -->
+  <t-popup visible="{{showEditSheet}}" placement="bottom" customStyle="height:50vh" bind:visible-change="onEditSheetClose">
+    <view class="sheet">
+      <view class="sheet-header">编辑个人信息</view>
+      <view class="sheet-body">
+        <view class="avatar-row">
+          <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+            <image class="avatar" src="{{userInfo.localAvatarUrl || userInfo.avatarUrl}}"></image>
+          </button>
+          <block wx:if="{{!editingNickname}}">
+            <view class="avatar-nickname" bindtap="onNicknameTap">{{ userInfo.nickname || '点击填写昵称' }}</view>
+          </block>
+          <block wx:else>
+            <t-input class="avatar-nickname-input" value="{{userInfo.nickname}}" placeholder="请输入昵称" focus="{{true}}" bindchange="onNicknameChange" bindblur="onNicknameBlur" />
+          </block>
+        </view>
+        <view class="field">
+          <view class="label">您的角色</view>
+          <t-picker 
+            class="role-picker" 
+            value="{{rolePickerValue}}" 
+            keys="{{ { value: 'value', label: 'label' } }}" 
+            usePopup="{{false}}" 
+            bind:change="onRoleChange"
+            bind:pick="onRoleChange"
+            header="{{false}}" 
+            cancelBtn="{{false}}" 
+            confirmBtn="{{false}}" 
+            show-toolbar="{{false}}">
+            <t-picker-item options="{{roleOptions}}"></t-picker-item>
+          </t-picker>
+        </view>
+      </view>
+      <view class="sheet-footer">
+        <t-button block theme="primary" bindtap="onSaveProfile" loading="{{saving}}">确定</t-button>
+      </view>
+    </view>
+  </t-popup>
+
+  <!-- 邀请码弹窗 -->
+  <t-popup visible="{{showInviteSheet}}" placement="bottom" bind:visible-change="onInviteSheetClose">
+    <view class="invite-sheet">
+      <view class="sheet-header">
+        <text class="sheet-title">家庭邀请码</text>
+      </view>
+      
+      <view class="invite-body">
+        <view class="invite-code-box">
+          <text class="invite-code">{{inviteCode || '暂无邀请码'}}</text>
+        </view>
+        <text class="invite-tip">分享此邀请码，邀请家人加入</text>
+      </view>
+
+      <view class="invite-footer">
+        <t-button theme="default" size="large" bindtap="generateInviteCode" loading="{{generating}}">
+          重新生成
+        </t-button>
+        <t-button theme="primary" size="large" bindtap="onCopyInviteCode">
+          复制邀请码
+        </t-button>
+      </view>
+    </view>
+  </t-popup>
 </view>

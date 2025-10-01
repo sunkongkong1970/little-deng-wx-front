@@ -29,7 +29,17 @@
         </view>
         <view class="field">
           <view class="label">您的角色</view>
-          <t-picker class="role-picker" value="{{rolePickerValue}}" keys="{{ { value: 'value', label: 'label' } }}" usePopup="{{false}}" bind:change="onRoleChange" header="{{false}}" cancelBtn="{{false}}" confirmBtn="{{false}}" show-toolbar="{{false}}">
+          <t-picker 
+            class="role-picker" 
+            value="{{rolePickerValue}}" 
+            keys="{{ { value: 'value', label: 'label' } }}" 
+            usePopup="{{false}}" 
+            bind:change="onRoleChange"
+            bind:pick="onRoleChange"
+            header="{{false}}" 
+            cancelBtn="{{false}}" 
+            confirmBtn="{{false}}" 
+            show-toolbar="{{false}}">
             <t-picker-item options="{{roleOptions}}"></t-picker-item>
           </t-picker>
         </view>

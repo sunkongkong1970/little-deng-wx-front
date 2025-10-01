@@ -49,6 +49,7 @@ Page({
     const base = {
       showSheet: true,
       createMode: !!create
+      // 不在这里重置 rolePickerValue，让 loadRoleOptions 设置初始值
     };
     if (cachedNickname) base['userInfo.nickName'] = cachedNickname;
     if (cachedAvatarPath) base['userInfo.localAvatarUrl'] = cachedAvatarPath;
@@ -56,9 +57,9 @@ Page({
       if (!cachedNickname) {
         this.fetchDefaultProfile();
       }
+      // 拉取角色选项
+      this.loadRoleOptions();
     });
-    // 拉取角色选项
-    this.loadRoleOptions();
   },
   onSheetVisibleChange(e) {
     this.setData({
@@ -130,11 +131,22 @@ Page({
           value: String(roleId)
         }));
       }
-      // 根据数据条数设置首次定位：>=3 定位到第3条，否则定位到最后一条
+      
+      console.log('=== 角色选项详情 ===');
+      labels.forEach((item, index) => {
+        console.log(`索引 ${index}: label="${item.label}", value="${item.value}"`);
+      });
+      
+      console.log('=== 角色选项加载完成 ===');
+      
+      // 设置初始定位到第3个选项（索引2）
       const len = labels.length;
       const initialIndex = len >= 3 ? 2 : (len > 0 ? len - 1 : -1);
       const initialValue = initialIndex >= 0 ? [labels[initialIndex].value] : [];
       const initialLabel = initialIndex >= 0 ? labels[initialIndex].label : '请选择角色';
+      
+      console.log(`初始定位: 索引=${initialIndex}, value=${initialValue[0]}, label=${initialLabel}`);
+      
       this.setData({
         roleOptions: labels,
         rolePickerValue: initialValue,
@@ -142,6 +154,8 @@ Page({
       }, () => {
         if (!this.data.roleOptions.length) {
           wx.showToast({ title: '角色数据为空', icon: 'none' });
+        } else {
+          console.log(`角色选项已加载，初始选中: ${initialLabel}`);
         }
       });
     }).catch((err) => {
@@ -165,9 +179,33 @@ Page({
       value,
       label
     } = e.detail;
+    
+    console.log('=== 角色选择变更事件 ===');
+    console.log('事件类型:', e.type);
+    console.log('事件返回 - value:', value, 'label:', label);
+    
+    // 使用 label 来查找对应的 value（因为 label 是用户看到并选择的）
+    let actualValue = value;
+    let actualLabel = (label && label[0]) || '请选择角色';
+    
+    if (label && label[0]) {
+      // 根据 label 查找对应的选项，这是用户实际选择的
+      const selectedByLabel = this.data.roleOptions.find(opt => opt.label === label[0]);
+      console.log('根据 label 查找到的选项:', selectedByLabel);
+      
+      if (selectedByLabel) {
+        // 使用 label 对应的 value，而不是事件中的 value
+        actualValue = [selectedByLabel.value];
+        actualLabel = selectedByLabel.label;
+        console.log('实际应该使用的值:', { value: actualValue, label: actualLabel });
+      }
+    }
+    
     this.setData({
-      rolePickerValue: value,
-      roleLabel: (label && label[0]) || '请选择角色'
+      rolePickerValue: actualValue,
+      roleLabel: actualLabel
+    }, () => {
+      console.log('更新后 - rolePickerValue:', this.data.rolePickerValue, 'roleLabel:', this.data.roleLabel);
     });
   },
   onFamilyNameChange(e) {
@@ -319,10 +357,49 @@ Page({
     // 创建家庭与加入家庭分支
     if (this.data.createMode) {
       // 创建家庭
-      api.createHome(token, this.data.rolePickerValue[0], this.data.userInfo.nickName, this.data.familyName, avatarBase64).then(() => {
+      console.log('=== 提交创建家庭 ===');
+    console.log('当前 rolePickerValue:', this.data.rolePickerValue);
+    console.log('当前 roleLabel:', this.data.roleLabel);
+    
+    // 验证角色是否已选择
+    if (!this.data.rolePickerValue || !this.data.rolePickerValue[0]) {
+      wx.showToast({ title: '请选择您的角色', icon: 'none' });
+      this.setData({ saving: false });
+      return;
+    }
+    
+    console.log('即将提交的角色 ID:', this.data.rolePickerValue[0]);
+    console.log('显示的角色名称:', this.data.roleLabel);
+    
+    // 验证：根据 rolePickerValue 找到实际的选项
+    const submittingOption = this.data.roleOptions.find(opt => opt.value === this.data.rolePickerValue[0]);
+    console.log('根据 rolePickerValue 找到的选项:', submittingOption);
+      
+      api.createHome(token, this.data.rolePickerValue[0], this.data.userInfo.nickName, this.data.familyName, avatarBase64).then(async () => {
+        // 创建成功后重新获取用户信息并刷新缓存
+        try {
+          const userRes = await api.getUserInfo(token);
+          let user;
+          if (userRes && typeof userRes.code !== 'undefined') {
+            if (userRes.code === 0) {
+              user = userRes.data;
+            }
+          } else {
+            user = userRes;
+          }
+          
+          if (user) {
+            // 更新用户信息缓存
+            wx.setStorageSync('userInfo', user);
+            console.log('用户信息已更新:', user);
+          }
+        } catch (error) {
+          console.error('获取用户信息失败:', error);
+        }
+        
         wx.showToast({ title: '家庭创建成功' });
         this.setData({ showSheet: false, saving: false });
-        wx.navigateTo({ url: '/pages/roleSetting/roleSetting' });
+        wx.switchTab({ url:'/pages/baby/baby' });
       }).catch(err => {
         this.setData({ saving: false });
         wx.showToast({
@@ -337,7 +414,7 @@ Page({
         this.data.userInfo.nickName,
         homeCode,
         avatarBase64
-      ).then((res) => {
+      ).then(async (res) => {
         if (res && typeof res.code !== 'undefined' && res.code !== 0) {
           this.setData({
             saving: false
@@ -348,6 +425,28 @@ Page({
           });
           return;
         }
+        
+        // 加入成功后重新获取用户信息并刷新缓存
+        try {
+          const userRes = await api.getUserInfo(token);
+          let user;
+          if (userRes && typeof userRes.code !== 'undefined') {
+            if (userRes.code === 0) {
+              user = userRes.data;
+            }
+          } else {
+            user = userRes;
+          }
+          
+          if (user) {
+            // 更新用户信息缓存
+            wx.setStorageSync('userInfo', user);
+            console.log('用户信息已更新:', user);
+          }
+        } catch (error) {
+          console.error('获取用户信息失败:', error);
+        }
+        
         const localAvatarPath = this.data.userInfo.localAvatarUrl || wx.getStorageSync('localAvatarPath') || '';
         wx.setStorageSync('profile', {
           roleName,

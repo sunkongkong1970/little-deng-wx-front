@@ -95,6 +95,11 @@ const api = {
     id
   }),
 
+   //获取邀请码
+   generateCode: (token) => request('/api/home/generateCode', 'GET', {}, {
+    token
+  }),
+
   // 上传图片文件（通过wx.uploadFile）
   uploadImageFile: (token, typeEnum, filePath) => {
     return new Promise((resolve, reject) => {
