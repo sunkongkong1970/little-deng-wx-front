@@ -1,0 +1,286 @@
+.page {
+  padding: 0 30rpx 120rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 头像上传区域 */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin: 20rpx 0 40rpx;
+}
+
+.avatar-upload {
+  width: 700rpx;
+  height: 400rpx;
+  border-radius: 24rpx;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 5rpx dashed #e0e0e0;
+}
+
+.avatar-upload image,
+.avatar-upload t-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24rpx;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24rpx;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24rpx;
+  background-color: #f5f5f5;
+}
+
+.placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #999;
+  background-color: #f5f5f5;
+  border-radius: 24rpx;
+}
+
+.upload-tip {
+  font-size: 32rpx;
+  color: #999;
+  margin-top: 20rpx;
+}
+
+.avatar-upload:active {
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+  transform: scale(0.98);
+  border-color: #07C160;
+}
+
+/* 裁剪界面 */
+.cropper-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cropper-container {
+  width: 100%;
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+}
+
+.cropper-header {
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.cropper-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.cropper-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 20rpx 0;
+}
+
+.cropper-controls {
+  margin-top: 30rpx;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.cancel-btn,
+.confirm-btn {
+  flex: 1;
+}
+
+/* 表单容器 */
+.form-container {
+  margin-bottom: 30rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+  background-color: white;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  min-height: 80rpx;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  flex-shrink: 0;
+  width: 180rpx;
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.form-input {
+  flex: 1;
+  text-align: right;
+}
+
+.form-value {
+  font-size: 28rpx;
+  color: #666;
+  text-align: right;
+}
+
+.picker-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.gender-group {
+  display: flex;
+  gap: 40rpx;
+  justify-content: flex-end;
+}
+
+.gender-radio {
+  margin: 0;
+}
+
+/* 描述容器 */
+.description-container {
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.description-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.description-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.word-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.description-content {
+  min-height: 150rpx;
+}
+
+.description-textarea {
+  width: 100%;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.description-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* 底部操作按钮 */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx;
+  background-color: white;
+  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.footer-single {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-btn {
+  width: 500rpx;
+  height: 88rpx;
+}
+
+.footer-double {
+  display: flex;
+  gap: 20rpx;
+}
+
+.footer-double .cancel-btn,
+.footer-double .submit-btn {
+  flex: 1;
+}
+
+/* 大图预览 */
+.full-image-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.full-image {
+  width: 100%;
+  height: 100%;
+}
+

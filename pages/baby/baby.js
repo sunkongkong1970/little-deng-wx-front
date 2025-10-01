@@ -8,7 +8,8 @@ Page({
     loading: false,
     hasUserInfo: false,
     canIUseGetUserProfile: wx.canIUse('getUserProfile'),
-    errorMsg: ''
+    errorMsg: '',
+    babyList: [] // 宝宝列表
   },
 
   async onLoad() {
@@ -24,6 +25,8 @@ Page({
           throw new Error(res?.message || '获取用户信息失败');
         }
         // 用户已登录，不需要显示登录弹窗
+        // 加载宝宝列表
+        await this.loadBabyList();
       } else {
         // 用户未登录，显示登录弹窗
         this.setData({
@@ -42,6 +45,45 @@ Page({
     }
   },
 
+  // 加载宝宝列表
+  async loadBabyList() {
+    try {
+      // 从缓存获取用户信息
+      const userInfo = wx.getStorageSync('userInfo');
+      if (!userInfo || !userInfo.homeId) {
+        console.log('未找到用户homeId');
+        return;
+      }
+
+      // 调用接口获取宝宝列表
+      const babyList = await api.getBabyList(userInfo.homeId);
+      console.log('宝宝列表:', babyList);
+
+      this.setData({
+        babyList: babyList || [],
+        hasBaby: babyList && babyList.length > 0
+      });
+    } catch (error) {
+      console.error('加载宝宝列表失败:', error);
+      wx.showToast({
+        title: '加载宝宝列表失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 点击宝宝卡片，跳转到详情页
+  onBabyCardTap(e) {
+    console.log(111)
+    const { childId } = e.currentTarget.dataset;
+    console.log(e.currentTarget)
+    if (childId) {
+      wx.navigateTo({
+        url: `/pages/babyDetail/babyDetail?id=${childId}`
+      });
+    }
+  },
+
   // 关闭登录弹窗
   closeAuth() {
     this.setData({
@@ -54,9 +96,12 @@ Page({
     // 防止点击弹窗内容时触发mask的点击事件
   },
 
-  onShow() {
-    // 从添加宝宝页面返回时，可以在这里刷新数据
-    // 实际项目中可能需要从缓存或服务器获取最新状态
+  async onShow() {
+    // 从添加宝宝页面返回时，刷新宝宝列表
+    const token = wx.getStorageSync('token');
+    if (token) {
+      await this.loadBabyList();
+    }
   },
 
   //点击授权按钮后触发的回调
@@ -108,7 +153,6 @@ Page({
       // 2. 登录换取 token
       const loginData = await api.userLogin(code);
       const token = loginData && loginData.token;
-      console.log("000   "+token)
       if (!token) {
         throw new Error('登录失败');
       }
@@ -133,12 +177,18 @@ Page({
         throw new Error('获取用户信息失败');
       }
 
+      // 5. 保存用户信息到缓存
+      wx.setStorageSync('userInfo', user);
+
       wx.showToast({
         title: '登录成功'
       });
       this.setData({
         authVisible: false
       });
+
+      // 登录成功后加载宝宝列表
+      await this.loadBabyList();
 
     } catch (err) {
       console.error('登录失败:', err);
@@ -185,7 +235,7 @@ Page({
         
         // 创建image对象
         const img = canvas.createImage()
-        img.src = '/assets/sample-baby.jpg'
+        img.src = '/assets/baby.png'
         
         img.onload = () => {
           // 设置canvas尺寸

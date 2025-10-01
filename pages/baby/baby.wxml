@@ -4,11 +4,23 @@
   
   <!-- 宝宝卡片区域 -->
   <view class="cards-container">
-    <block wx:if="{{hasBaby}}">
-      <t-card class="baby-card">
+    <!-- 宝宝列表 -->
+    <block wx:if="{{babyList.length > 0}}">
+      <t-card 
+        wx:for="{{babyList}}" 
+        wx:key="childId" 
+        class="baby-card"
+        bindtap="onBabyCardTap"
+        data-child-id="{{item.id}}"
+      >
         <view slot="cover" class="baby-card-cover">
-          <t-image class="baby-image" src="/assets/baby.png" mode="aspectFill" bindload="onImageLoad" />
-          <text class="baby-name-floating" style="color: {{textColor}}">小宝</text>
+          <t-image 
+            class="baby-image" 
+            src="{{item.childCoverCroppedImg}}" 
+            mode="aspectFill" 
+            bindload="onImageLoad" 
+          />
+          <text class="baby-name-floating">{{item.childNickname}}</text>
         </view>
       </t-card>
     </block>
@@ -32,5 +44,6 @@
       </view>
     </view>
   </view>
+
   <t-toast id="toast" />
 </view>

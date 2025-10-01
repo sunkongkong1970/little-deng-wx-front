@@ -4,6 +4,7 @@
     "pages/familySelect/familySelect",
     "pages/roleSetting/roleSetting",
     "pages/babyAdd/babyAdd",
+    "pages/babyDetail/babyDetail",
     "pages/apps/apps",
     "pages/moment/moment",
     "pages/mine/mine",

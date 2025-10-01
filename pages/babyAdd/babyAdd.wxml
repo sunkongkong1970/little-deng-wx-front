@@ -82,9 +82,18 @@
 
     <!-- 出生日期 -->
     <view class="form-item" bindtap="showDatePicker">
-      <view class="form-label">出生日期</view>
+      <view class="form-label">出生日期<text style="color: #ff0000;">*</text></view>
       <view class="form-content">
-        <text class="picker-text">{{babyInfo.birthday || '请选择出生日期'}}</text>
+        <text class="picker-text">{{birthDate || '请选择出生日期'}}</text>
+        <t-icon name="chevron-right" size="24rpx" color="#999" />
+      </view>
+    </view>
+
+    <!-- 出生时间 -->
+    <view class="form-item" bindtap="showTimePicker">
+      <view class="form-label">出生时间</view>
+      <view class="form-content">
+        <text class="picker-text">{{birthTime || '请选择出生时间（可选）'}}</text>
         <t-icon name="chevron-right" size="24rpx" color="#999" />
       </view>
     </view>
@@ -123,5 +132,12 @@
     <t-picker-item options="{{yearOptions}}"></t-picker-item>
     <t-picker-item options="{{monthOptions}}"></t-picker-item>
     <t-picker-item options="{{dayOptions}}"></t-picker-item>
+  </t-picker>
+
+  <!-- 时间选择器 -->
+  <t-picker visible="{{showTimePicker}}" title="选择出生时间" value="{{timePickerValue}}" keys="{{ { value: 'value', label: 'label' } }}" cancelBtn="取消" confirmBtn="确认" bind:confirm="onTimePickerConfirm" bind:cancel="onTimePickerCancel">
+    <t-picker-item options="{{hourOptions}}"></t-picker-item>
+    <t-picker-item options="{{minuteOptions}}"></t-picker-item>
+    <t-picker-item options="{{secondOptions}}"></t-picker-item>
   </t-picker>
 </view>

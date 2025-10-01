@@ -5,26 +5,26 @@ import config from '../../env.js';
 
 Page({
   data: {
+    childId: null,
+    isEdit: false, // 是否处于编辑模式
+    isHouseholder: false, // 是否是户主
     babyInfo: {
+      childId: '',
       childName: '',
       childNickname: '',
       childGender: '',
       childBirthday: '',
       childContent: '',
-      avatarOriginal: '', // 存储原始图片路径
-      avatarCropped: '', // 存储裁剪后图片路径
-      avatarCroppedTmp: '' // 存储裁剪后图片路径
+      childZodiac: '', // 星座
+      childChineseZodiac: '', // 生肖
+      childCoverImg: '', // 原图
+      childCoverCroppedImg: '', // 裁剪图
+      avatarOriginal: '', // 编辑时的原始图片
+      avatarCropped: '', // 编辑时的裁剪图片
+      avatarCroppedTmp: ''
     },
-    genderOptions: [{
-        label: '男宝',
-        value: 'male'
-      },
-      {
-        label: '女宝',
-        value: 'female'
-      }
-    ],
-    currentDate: '',
+    showFullImage: false, // 控制大图展示
+    currentFullImage: '', // 当前展示的大图URL
     showDatePicker: false,
     showTimePicker: false,
     datePickerValue: [],
@@ -36,26 +36,111 @@ Page({
     minuteOptions: [],
     secondOptions: [],
     descriptionLength: 0,
-    birthDate: '', // 存储选择的日期 YYYY-MM-DD
-    birthTime: '', // 存储选择的时间 HH:mm:ss
+    birthDate: '',
+    birthTime: '',
     showCropper: false,
     tempImagePath: ''
   },
 
-  onLoad() {
-    // 初始化当前日期
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const currentDate = `${year}-${month}-${day}`;
+  async onLoad(options) {
+    const { id } = options;
+    if (id) {
+      this.setData({ childId: id });
+      
+      // 获取用户信息判断是否是户主
+      const userInfo = wx.getStorageSync('userInfo');
+      if (userInfo) {
+        this.setData({ isHouseholder: userInfo.isHouseholder || false });
+      }
+
+      // 加载宝宝详情
+      await this.loadBabyDetail(id);
+    }
 
     // 生成日期选择器数据
     this.generateDateOptions();
+  },
+
+  // 加载宝宝详情
+  async loadBabyDetail(id) {
+    try {
+      wx.showLoading({ title: '加载中...' });
+      const babyData = await api.getBaby(id);
+      console.log('宝宝详情:', babyData);
+
+      // 解析生日
+      let birthDate = '';
+      let birthTime = '';
+      if (babyData.childBirthday) {
+        const datetime = babyData.childBirthday.replace('T', ' ');
+        const parts = datetime.split(' ');
+        birthDate = parts[0];
+        birthTime = parts[1] || '00:00:00';
+      }
+
+      this.setData({
+        babyInfo: {
+          ...this.data.babyInfo,
+          id: babyData.id, // 接口返回的是id字段
+          childName: babyData.childName || '',
+          childNickname: babyData.childNickname || '',
+          childGender: babyData.childGender || '',
+          childBirthday: babyData.childBirthday || '',
+          childContent: babyData.childContent || '',
+          childZodiac: babyData.childZodiac || '',
+          childChineseZodiac: babyData.childChineseZodiac || '',
+          childCoverImg: babyData.childCoverImg || '',
+          childCoverCroppedImg: babyData.childCoverCroppedImg || ''
+        },
+        birthDate,
+        birthTime,
+        descriptionLength: (babyData.childContent || '').length
+      });
+
+      wx.hideLoading();
+    } catch (error) {
+      console.error('加载宝宝详情失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 点击图片显示大图
+  onImageTap() {
+    if (this.data.babyInfo.childCoverImg) {
+      this.setData({
+        showFullImage: true,
+        currentFullImage: this.data.babyInfo.childCoverImg
+      });
+    }
+  },
+
+  // 关闭大图展示
+  closeFullImage() {
     this.setData({
-      currentDate
+      showFullImage: false,
+      currentFullImage: ''
+    });
+  },
+
+  // 进入编辑模式
+  onEdit() {
+    this.setData({ 
+      isEdit: true,
+      'babyInfo.avatarCropped': this.data.babyInfo.childCoverCroppedImg,
+      'babyInfo.avatarOriginal': this.data.babyInfo.childCoverImg
     });
     this.initCropper();
+  },
+
+  // 取消编辑
+  onCancelEdit() {
+    this.setData({ isEdit: false });
+    // 重新加载数据
+    this.loadBabyDetail(this.data.childId);
   },
 
   // 获取裁剪尺寸
@@ -76,7 +161,6 @@ Page({
       height
     } = this.getCropSize()
     this.setData({
-      'babyInfo.avatarOriginalTmp': "",
       'babyInfo.avatarCroppedTmp': "",
     })
     this.cropper = new WeCropper({
@@ -121,14 +205,13 @@ Page({
       this.cropper.getCropperImage((src) => {
         if (src) {
           this.setData({
-            'babyInfo.avatar': src,
             'babyInfo.avatarCropped': src,
             'babyInfo.avatarCroppedTmp': src,
             showCropper: false
           })
 
           wx.showToast({
-            title: '添加成功',
+            title: '裁剪成功',
             icon: 'success'
           })
         }
@@ -180,6 +263,7 @@ Page({
       showCropper: false
     });
   },
+
   // 生成日期选择器数据
   generateDateOptions() {
     const now = new Date();
@@ -289,13 +373,13 @@ Page({
 
   // 描述失焦处理
   onDescriptionBlur(e) {
-    // 可以在这里添加额外的验证逻辑
     console.log('描述输入完成:', e.detail.value);
   },
 
   // 显示日期选择器
   showDatePicker() {
-    // 如果有已选择的日期，设置为默认值
+    if (!this.data.isEdit) return;
+    
     let datePickerValue = [];
     if (this.data.birthDate) {
       const date = new Date(this.data.birthDate);
@@ -305,7 +389,6 @@ Page({
         date.getDate()
       ];
     } else {
-      // 默认选择当前日期
       const now = new Date();
       datePickerValue = [
         now.getFullYear(),
@@ -314,7 +397,6 @@ Page({
       ];
     }
 
-    // 根据选择的年月更新日期选项
     this.updateDayOptions(datePickerValue[0], datePickerValue[1]);
 
     this.setData({
@@ -325,7 +407,8 @@ Page({
 
   // 显示时间选择器
   showTimePicker() {
-    // 如果有已选择的时间，设置为默认值
+    if (!this.data.isEdit) return;
+    
     let timePickerValue = [];
     if (this.data.birthTime) {
       const timeParts = this.data.birthTime.split(':');
@@ -335,7 +418,6 @@ Page({
         parseInt(timeParts[2])
       ];
     } else {
-      // 默认选择 00:00:00
       timePickerValue = [0, 0, 0];
     }
 
@@ -350,7 +432,6 @@ Page({
     const newValue = e.detail.value;
     const [year, month] = newValue;
 
-    // 如果年份或月份发生变化，更新日期选项
     const currentValue = this.data.datePickerValue;
     if (currentValue.length > 0 && (currentValue[0] !== year || currentValue[1] !== month)) {
       this.updateDayOptions(year, month);
@@ -363,7 +444,6 @@ Page({
 
   // 更新日期选项
   updateDayOptions(year, month) {
-    // 根据月份和年份计算天数
     const getDaysInMonth = (year, month) => {
       return new Date(year, month, 0).getDate();
     };
@@ -390,7 +470,6 @@ Page({
     const day = String(value[2]).padStart(2, '0');
     const birthDate = `${year}-${month}-${day}`;
 
-    // 更新完整的生日信息
     this.updateBirthday(birthDate, this.data.birthTime);
 
     this.setData({
@@ -414,7 +493,6 @@ Page({
     const second = String(value[2]).padStart(2, '0');
     const birthTime = `${hour}:${minute}:${second}`;
 
-    // 更新完整的生日信息
     this.updateBirthday(this.data.birthDate, birthTime);
 
     this.setData({
@@ -433,7 +511,6 @@ Page({
   // 更新完整的生日信息
   updateBirthday(date, time) {
     if (date) {
-      // 如果有时间就拼接，没有时间就只显示日期
       const birthday = time ? `${date} ${time}` : date;
       this.setData({
         'babyInfo.childBirthday': birthday
@@ -441,20 +518,19 @@ Page({
     }
   },
 
-
-
+  // 提交更新
   async onSubmit() {
     const {
+      childId,
       childName,
       childNickname,
       childGender,
-      childBirthday,
       childContent,
       avatarOriginal,
       avatarCropped
     } = this.data.babyInfo;
 
-    // 简单的表单验证
+    // 表单验证
     if (!childName.trim()) {
       wx.showToast({
         title: '请输入宝宝姓名',
@@ -479,7 +555,6 @@ Page({
       return;
     }
 
-    // 验证日期（必填）
     if (!this.data.birthDate) {
       wx.showToast({
         title: '请选择出生日期',
@@ -488,7 +563,6 @@ Page({
       return;
     }
 
-    // 验证描述字数
     if (childContent && childContent.length > 300) {
       wx.showToast({
         title: '描述不能超过300字',
@@ -496,7 +570,7 @@ Page({
       });
       return;
     }
-    // 获取token
+
     const token = wx.getStorageSync('token');
     if (!token) {
       wx.showToast({
@@ -505,13 +579,13 @@ Page({
       });
       return;
     }
+
     try {
-      // 有选择图片的情况下，上传图片
-      if (avatarOriginal && avatarCropped) {
-        // 调用api.js中的uploadImageFile方法上传图片
+      // 如果选择了新图片，上传图片
+      if (avatarOriginal && avatarCropped && avatarOriginal !== this.data.babyInfo.childCoverImg) {
         const uploadResultCropped = await api.uploadImageFile(token, 'BABY', avatarCropped);
         const uploadResultOriginal = await api.uploadImageFile(token, 'BABY', avatarOriginal);
-        // 这里可以将返回的图片路径保存到babyInfo中
+        
         this.setData({
           'babyInfo.avatarCropped': uploadResultCropped,
           'babyInfo.avatarOriginal': uploadResultOriginal
@@ -523,36 +597,39 @@ Page({
         title: '上传图片失败',
         icon: 'none'
       });
+      return;
     }
 
-     // 这里可以添加保存宝宝信息的逻辑
-     // 将日期格式转换为LocalDateTime格式 (YYYY-MM-DDTHH:mm:ss)
-     // 如果没有选择时间，自动补全为 00:00:00
-     const birthTime = this.data.birthTime || '00:00:00';
-     const fullBirthday = `${this.data.birthDate}T${birthTime}`;
-     
-     const babyInfoToSubmit = {
-       ...this.data.babyInfo,
-       childBirthday: fullBirthday
-     };
-     
-     const babyId = await api.editBaby(token, babyInfoToSubmit);
-     if (babyId) {
+    // 转换日期格式
+    const birthTime = this.data.birthTime || '00:00:00';
+    const fullBirthday = `${this.data.birthDate}T${birthTime}`;
+    
+    const babyInfoToSubmit = {
+      ...this.data.babyInfo,
+      childId: childId, // 添加id字段
+      childBirthday: fullBirthday
+    };
+    
+    try {
+      const result = await api.editBaby(token, babyInfoToSubmit);
+      if (result) {
+        wx.showToast({
+          title: '更新成功',
+          icon: 'success',
+          duration: 1500
+        });
+        
+        // 退出编辑模式并重新加载数据
+        this.setData({ isEdit: false });
+        await this.loadBabyDetail(this.data.childId);
+      }
+    } catch (error) {
+      console.error('更新失败:', error);
       wx.showToast({
-        title: '添加成功',
-        icon: 'success',
-        duration: 2000,
-        success: () => {
-          // 返回上一页并刷新
-          setTimeout(() => {
-            wx.navigateBack();
-          }, 2000);
-        }
+        title: error.message || '更新失败',
+        icon: 'none'
       });
-     }
-  },
-
-  onCancel() {
-    wx.navigateBack();
+    }
   }
 });
+

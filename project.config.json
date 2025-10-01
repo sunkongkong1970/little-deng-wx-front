@@ -37,5 +37,12 @@
     "tabSize": 2
   },
   "appid": "wxaffcf37f7585f643",
-  "simulatorPluginLibVersion": {}
+  "simulatorPluginLibVersion": {},
+  "urlCheck": false,
+  "uploadExclude": [
+    "assets/**"
+  ],
+  "downloadExclude": [
+    "assets/**"
+  ]
 }

@@ -8,3 +8,9 @@
   padding: 200rpx 0;
   box-sizing: border-box;
 } 
+@font-face {
+  font-family: 'tdesign-icon';
+  src: url('/assets/fonts/t.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}

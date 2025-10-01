@@ -1,0 +1,217 @@
+<view class="page">
+  <!-- 头像区域 -->
+  <view class="avatar-section">
+    <view class="avatar-upload" bindtap="{{isEdit ? 'onChooseAvatar' : 'onImageTap'}}">
+      <t-image 
+        wx:if="{{isEdit && babyInfo.avatarCropped}}" 
+        src="{{babyInfo.avatarCropped}}" 
+        mode="aspectFill" 
+        class="avatar-image"
+      />
+      <t-image 
+        wx:elif="{{!isEdit && babyInfo.childCoverCroppedImg}}" 
+        src="{{babyInfo.childCoverCroppedImg}}" 
+        mode="aspectFill" 
+        class="avatar-image"
+      />
+      <t-image 
+        wx:else 
+        src="/assets/baby.png" 
+        mode="aspectFill" 
+        class="avatar-placeholder"
+      >
+        <view slot="error" class="placeholder-content">
+          <t-icon name="camera" size="60rpx" color="#ccc" />
+          <text class="upload-tip">{{isEdit ? '点击上传头像' : '暂无图片'}}</text>
+        </view>
+      </t-image>
+    </view>
+  </view>
+
+  <!-- 裁剪界面 -->
+  <view wx:if="{{showCropper && isEdit}}" class="cropper-overlay">
+    <view class="cropper-container">
+      <view class="cropper-header">
+        <text class="cropper-title">调整图片</text>
+      </view>
+      <view class="cropper-wrapper">
+        <canvas 
+          id="cropper" 
+          canvas-id="cropper"
+          style="width: 680rpx; height: 380rpx;"
+          disable-scroll
+          bindtouchstart="touchStart"
+          bindtouchmove="touchMove"
+          bindtouchend="touchEnd"
+        ></canvas>
+      </view>
+      
+      <view class="cropper-controls">
+        <view class="action-buttons">
+          <t-button class="cancel-btn" bindtap="cancelCrop" theme="default">取消</t-button>
+          <t-button class="confirm-btn" bindtap="getCroppedImage" theme="primary">确认</t-button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-container">
+    <!-- 宝宝姓名 -->
+    <view class="form-item">
+      <view class="form-label">宝宝姓名</view>
+      <view class="form-content">
+        <t-input 
+          wx:if="{{isEdit}}"
+          class="form-input" 
+          placeholder="请输入宝宝姓名" 
+          placeholder-style="color: #999" 
+          bindchange="onNameInput" 
+          value="{{babyInfo.childName}}" 
+        />
+        <text wx:else class="form-value">{{babyInfo.childName || '未填写'}}</text>
+      </view>
+    </view>
+
+    <!-- 宝宝昵称 -->
+    <view class="form-item">
+      <view class="form-label">宝宝昵称</view>
+      <view class="form-content">
+        <t-input 
+          wx:if="{{isEdit}}"
+          class="form-input" 
+          placeholder="请输入宝宝昵称" 
+          placeholder-style="color: #999" 
+          bindchange="onNickNameInput" 
+          value="{{babyInfo.childNickname}}" 
+        />
+        <text wx:else class="form-value">{{babyInfo.childNickname || '未填写'}}</text>
+      </view>
+    </view>
+
+    <!-- 性别选择 -->
+    <view class="form-item">
+      <view class="form-label">宝宝性别</view>
+      <view class="form-content">
+        <t-radio-group 
+          wx:if="{{isEdit}}"
+          class="gender-group" 
+          value="{{babyInfo.childGender}}" 
+          bindchange="onGenderChange"
+        >
+          <t-radio class="gender-radio" value="male">男宝</t-radio>
+          <t-radio class="gender-radio" value="female">女宝</t-radio>
+        </t-radio-group>
+        <text wx:else class="form-value">{{babyInfo.childGender === 'male' ? '男宝' : babyInfo.childGender === 'female' ? '女宝' : '未填写'}}</text>
+      </view>
+    </view>
+
+    <!-- 出生日期 -->
+    <view class="form-item" bindtap="showDatePicker">
+      <view class="form-label">出生日期{{isEdit ? '' : ''}}</view>
+      <view class="form-content">
+        <text class="{{isEdit ? 'picker-text' : 'form-value'}}">{{birthDate || '请选择出生日期'}}</text>
+        <t-icon wx:if="{{isEdit}}" name="chevron-right" size="24rpx" color="#999" />
+      </view>
+    </view>
+
+    <!-- 出生时间 -->
+    <view class="form-item" bindtap="showTimePicker">
+      <view class="form-label">出生时间</view>
+      <view class="form-content">
+        <text class="{{isEdit ? 'picker-text' : 'form-value'}}">{{birthTime || (isEdit ? '请选择出生时间（可选）' : '未填写')}}</text>
+        <t-icon wx:if="{{isEdit}}" name="chevron-right" size="24rpx" color="#999" />
+      </view>
+    </view>
+
+    <!-- 星座 -->
+    <view class="form-item">
+      <view class="form-label">星座</view>
+      <view class="form-content">
+        <text class="form-value">{{babyInfo.childZodiac || '未知'}}</text>
+      </view>
+    </view>
+
+    <!-- 生肖 -->
+    <view class="form-item">
+      <view class="form-label">生肖</view>
+      <view class="form-content">
+        <text class="form-value">{{babyInfo.childChineseZodiac || '未知'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 宝宝描述 -->
+  <view class="description-container">
+    <view class="description-header">
+      <text class="description-title">宝宝描述</text>
+      <text wx:if="{{isEdit}}" class="word-count">{{descriptionLength}}/300</text>
+    </view>
+    <view class="description-content">
+      <t-textarea
+        wx:if="{{isEdit}}"
+        class="description-textarea"
+        placeholder="请输入宝宝描述（最多300字）"
+        placeholder-style="color: #999"
+        value="{{babyInfo.childContent}}"
+        maxlength="300"
+        bindchange="onDescriptionChange"
+        bindinput="onDescriptionInput"
+        bindblur="onDescriptionBlur"
+        auto-height
+        show-confirm-bar="{{false}}"
+      />
+      <text wx:else class="description-text">{{babyInfo.childContent || '暂无描述'}}</text>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="footer">
+    <view wx:if="{{!isEdit && isHouseholder}}" class="footer-single">
+      <t-button class="edit-btn" bindtap="onEdit" theme="primary">编辑</t-button>
+    </view>
+    <view wx:if="{{isEdit}}" class="footer-double">
+      <t-button class="cancel-btn" bindtap="onCancelEdit" theme="default">取消</t-button>
+      <t-button class="submit-btn" bindtap="onSubmit" theme="primary">保存</t-button>
+    </view>
+  </view>
+
+  <!-- 日期选择器 -->
+  <t-picker 
+    visible="{{showDatePicker}}" 
+    title="选择出生日期" 
+    value="{{datePickerValue}}" 
+    keys="{{ { value: 'value', label: 'label' } }}" 
+    cancelBtn="取消" 
+    confirmBtn="确认" 
+    bind:change="onDatePickerChange" 
+    bind:confirm="onDatePickerConfirm" 
+    bind:cancel="onDatePickerCancel"
+  >
+    <t-picker-item options="{{yearOptions}}"></t-picker-item>
+    <t-picker-item options="{{monthOptions}}"></t-picker-item>
+    <t-picker-item options="{{dayOptions}}"></t-picker-item>
+  </t-picker>
+
+  <!-- 时间选择器 -->
+  <t-picker 
+    visible="{{showTimePicker}}" 
+    title="选择出生时间" 
+    value="{{timePickerValue}}" 
+    keys="{{ { value: 'value', label: 'label' } }}" 
+    cancelBtn="取消" 
+    confirmBtn="确认" 
+    bind:confirm="onTimePickerConfirm" 
+    bind:cancel="onTimePickerCancel"
+  >
+    <t-picker-item options="{{hourOptions}}"></t-picker-item>
+    <t-picker-item options="{{minuteOptions}}"></t-picker-item>
+    <t-picker-item options="{{secondOptions}}"></t-picker-item>
+  </t-picker>
+
+  <!-- 大图预览 -->
+  <view wx:if="{{showFullImage}}" class="full-image-overlay" bindtap="closeFullImage">
+    <image class="full-image" src="{{currentFullImage}}" mode="aspectFit" />
+  </view>
+</view>
+

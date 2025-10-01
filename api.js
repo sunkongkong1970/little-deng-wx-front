@@ -78,12 +78,22 @@ const api = {
   getRoleOptions: (type) => request('/api/dict/dictList', 'GET', {
     type
   }),
-  // 上传图片（通过POST请求）
-  uploadImage: (token, typeEnum, image) => request('/api/image/upload', 'POST', {
+
+  //添加宝宝
+  editBaby: (token, babyInfo) => request('/api/child/edit', 'POST', {
     token,
-    typeEnum,
-    image
+    babyInfo
   }, {}),
+
+  //查询宝宝列表
+  getBabyList: (homeId) => request('/api/child/getList', 'GET', {}, {
+    homeId
+  }),
+
+  //查询宝宝详情
+  getBaby: (id) => request('/api/child/getById', 'GET', {}, {
+    id
+  }),
 
   // 上传图片文件（通过wx.uploadFile）
   uploadImageFile: (token, typeEnum, filePath) => {

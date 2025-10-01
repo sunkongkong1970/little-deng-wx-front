@@ -44,9 +44,17 @@
   font-size: 32rpx;
   font-weight: 700;
   color: white;
-  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.8);
   z-index: 10;
   padding: 10rpx 20rpx;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border-radius: 12rpx;
+  backdrop-filter: blur(8rpx);
+  max-width: 300rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
 }
 
 /* 添加宝宝卡片样式 */
