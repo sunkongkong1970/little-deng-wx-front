@@ -61,6 +61,17 @@ const api = {
   getUserInfo: (token) => request('/api/user/token', 'POST', {}, {
     token
   }),
+  // 获取用户头像
+  getUserAvatar: (token) => request('/api/user/avatar', 'POST', {}, {
+    token
+  }),
+  //编辑用户
+  editUser: (token, userName, userRole, userAvatarBase64 = '') => request('/api/user/edit', 'POST', {
+    token,
+    userName,
+    userRole,
+    userAvatarBase64
+  }, {}),
   // 加入家庭
   joinHome: (token, homeCode) => request('/api/', 'POST', {}, {
     token,

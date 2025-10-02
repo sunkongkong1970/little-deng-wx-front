@@ -5,7 +5,7 @@ const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia0
 Page({
   data: {
     userInfo: {
-      avatarUrl: defaultAvatarUrl,
+      avatarUrl: '', // 初始为空，加载时再设置真实头像或默认头像
       localAvatarUrl: '',
       nickname: '未登录',
       roleName: '未知',
@@ -30,21 +30,97 @@ Page({
     this.loadUserInfo();
   },
 
+  // 辅助函数：为 base64 数据添加前缀
+  formatBase64Image(base64Data) {
+    if (!base64Data) return '';
+    // 如果已经有前缀，直接返回
+    if (base64Data.startsWith('data:image')) return base64Data;
+    // 如果是 http/https 链接，直接返回
+    if (base64Data.startsWith('http://') || base64Data.startsWith('https://')) return base64Data;
+    // 如果是本地路径，直接返回（排除 base64 数据，如 /9j/ 开头的 JPEG）
+    if (base64Data.startsWith('wxfile://')) return base64Data;
+    // 否则添加 base64 前缀（自动识别 JPEG 或 PNG）
+    // JPEG 的 base64 通常以 /9j/ 开头，PNG 通常以 iVBORw 开头
+    const imageType = base64Data.startsWith('/9j/') ? 'jpeg' : 'png';
+    return `data:image/${imageType};base64,${base64Data}`;
+  },
+
   // 加载用户信息
-  loadUserInfo() {
+  async loadUserInfo() {
     const userInfo = wx.getStorageSync('userInfo') || {};
-    const token = wx.getStorageSync('token') || {};
+    const token = wx.getStorageSync('token') || '';
     console.log(userInfo)
     console.log(token)
     const nickname = wx.getStorageSync('nickname') || userInfo.userName || '未登录';
-    const avatarUrl = wx.getStorageSync('avatarUrl') || userInfo.avatarUrl || defaultAvatarUrl;
-    const localAvatarPath = wx.getStorageSync('localAvatarPath') || '';
+    // 注意：这里不设置默认值，保持原始的空值，以便正确判断是否需要从服务器获取
+    let avatarUrl = wx.getStorageSync('avatarUrl') || userInfo.avatarUrl || '';
+    let localAvatarPath = wx.getStorageSync('localAvatarPath') || '';
     const inviteCode = wx.getStorageSync('inviteCode') || '';
+
+    console.log("缓存的avatarUrl: " + avatarUrl)
+    console.log("本地avatarPath: " + localAvatarPath)
+    
+    // 判断缓存中的头像是否是默认头像或微信临时头像URL，如果是则忽略
+    if (avatarUrl === defaultAvatarUrl) {
+      console.log('缓存的头像是默认头像，将忽略并重新获取');
+      avatarUrl = '';
+    }
+    // 如果是微信头像 URL（http/https开头），也视为临时头像，需要从服务器获取真实的 base64 头像
+    if (avatarUrl && (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://'))) {
+      console.log('缓存的是微信临时头像URL，将从服务器获取真实头像');
+      avatarUrl = '';
+    }
+    if (localAvatarPath === defaultAvatarUrl) {
+      console.log('本地头像路径是默认头像，将忽略并重新获取');
+      localAvatarPath = '';
+    }
+    if (localAvatarPath && (localAvatarPath.startsWith('http://') || localAvatarPath.startsWith('https://'))) {
+      console.log('本地头像路径是微信临时URL，将从服务器获取真实头像');
+      localAvatarPath = '';
+    }
+    
+    // 如果缓存中没有真实头像（或只有默认头像），则从服务器获取
+    if (!avatarUrl && !localAvatarPath && token) {
+      try {
+        console.log('缓存中没有真实头像，从服务器获取...');
+        const avatarBase64 = await api.getUserAvatar(token);
+        if (avatarBase64) {
+          // 为 base64 数据添加前缀
+          const formattedAvatar = this.formatBase64Image(avatarBase64);
+          
+          // 缓存头像数据（保存格式化后的）
+          wx.setStorageSync('avatarUrl', formattedAvatar);
+          avatarUrl = formattedAvatar;
+          
+          // 同步更新 userInfo 缓存
+          userInfo.avatarUrl = formattedAvatar;
+          wx.setStorageSync('userInfo', userInfo);
+          
+          console.log('头像获取成功并已缓存，格式:', formattedAvatar.substring(0, 50) + '...');
+        } else {
+          console.log('接口返回头像为空');
+        }
+      } catch (err) {
+        console.error('获取用户头像失败:', err);
+      }
+    }
+
+    // 格式化已有的头像数据（确保有正确的前缀）
+    if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('wxfile://') && !avatarUrl.startsWith('data:image')) {
+      avatarUrl = this.formatBase64Image(avatarUrl);
+    }
+    if (localAvatarPath && !localAvatarPath.startsWith('http') && !localAvatarPath.startsWith('wxfile://') && !localAvatarPath.startsWith('data:image')) {
+      localAvatarPath = this.formatBase64Image(localAvatarPath);
+    }
+
+    // 最后：如果还是没有头像，使用默认头像（仅用于显示，不缓存）
+    const finalAvatarUrl = avatarUrl || defaultAvatarUrl;
+    const finalLocalAvatarUrl = localAvatarPath || avatarUrl || defaultAvatarUrl;
 
     this.setData({
       'userInfo.nickname': nickname,
-      'userInfo.avatarUrl': avatarUrl,
-      'userInfo.localAvatarUrl': localAvatarPath || avatarUrl,
+      'userInfo.avatarUrl': finalAvatarUrl,
+      'userInfo.localAvatarUrl': finalLocalAvatarUrl,
       'userInfo.roleName': userInfo.userRoleName || '未知',
       'userInfo.isHouseholder': userInfo.isHouseholder || false,
       inviteCode: inviteCode
@@ -111,9 +187,24 @@ Page({
       
       console.log('=== 角色选项加载完成 ===');
       
-      // 设置初始定位到第3个选项（索引2）
-      const len = labels.length;
-      const initialIndex = len >= 3 ? 2 : (len > 0 ? len - 1 : -1);
+      // 定位到当前用户的角色
+      const currentRoleName = this.data.userInfo.roleName || '';
+      console.log(`当前用户角色: ${currentRoleName}`);
+      
+      // 根据角色名称查找对应的选项
+      let initialIndex = -1;
+      if (currentRoleName && currentRoleName !== '未知') {
+        initialIndex = labels.findIndex(item => item.label === currentRoleName);
+        console.log(`根据角色名称"${currentRoleName}"查找，索引=${initialIndex}`);
+      }
+      
+      // 如果没找到当前角色，则使用默认定位（第3个选项或最后一个）
+      if (initialIndex === -1) {
+        const len = labels.length;
+        initialIndex = len >= 3 ? 2 : (len > 0 ? len - 1 : -1);
+        console.log(`未找到当前角色，使用默认定位，索引=${initialIndex}`);
+      }
+      
       const initialValue = initialIndex >= 0 ? [labels[initialIndex].value] : [];
       const initialLabel = initialIndex >= 0 ? labels[initialIndex].label : '请选择角色';
       
@@ -248,36 +339,59 @@ Page({
       const token = wx.getStorageSync('token') || '';
       const avatarPath = this.data.userInfo.localAvatarUrl || this.data.userInfo.avatarUrl;
       let avatarBase64 = '';
+      let hasNewAvatar = false;  // 标记是否有新头像
 
       // 读取头像base64
-      if (avatarPath && (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH))) {
-        try {
-          const fs = wx.getFileSystemManager();
-          const fileContent = fs.readFileSync(avatarPath, 'base64');
-          if (fileContent) {
-            avatarBase64 = fileContent;
+      if (avatarPath) {
+        if (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH)) {
+          // 如果是本地文件路径，读取文件
+          try {
+            const fs = wx.getFileSystemManager();
+            const fileContent = fs.readFileSync(avatarPath, 'base64');
+            if (fileContent) {
+              avatarBase64 = fileContent;
+              hasNewAvatar = true;
+            }
+          } catch (err) {
+            console.error('读取头像文件失败:', err);
           }
-        } catch (err) {
-          console.error('读取头像文件失败:', err);
+        } else if (avatarPath.startsWith('data:image')) {
+          // 如果是已格式化的 base64，提取纯 base64 部分
+          const base64Match = avatarPath.match(/base64,(.+)/);
+          if (base64Match && base64Match[1]) {
+            avatarBase64 = base64Match[1];
+            // 不标记为新头像，因为这是已有的
+          }
         }
       }
 
-      // 调用更新接口（使用 userJoinHome 接口更新资料）
-      console.log('调用 userJoinHome 接口，roleId:', this.data.rolePickerValue[0]);
-      await api.userJoinHome(
+      // 调用更新接口（使用 editUser 接口更新资料）
+      console.log('调用 editUser 接口，roleId:', this.data.rolePickerValue[0]);
+      console.log('头像数据:', hasNewAvatar ? '有新头像' : (avatarBase64 ? '使用已有头像' : '无头像'));
+      
+      await api.editUser(
         token,
-        this.data.rolePickerValue[0],
         nickname,
-        '', // homeCode为空表示不加入新家庭，只更新资料
+        this.data.rolePickerValue[0],
         avatarBase64
       );
 
       // 更新缓存
       wx.setStorageSync('nickname', nickname);
-      const userInfo = wx.getStorageSync('userInfo') || {};
-      userInfo.userName = nickname;
-      userInfo.roleName = roleLabel;
-      wx.setStorageSync('userInfo', userInfo);
+      const cachedUserInfo = wx.getStorageSync('userInfo') || {};
+      cachedUserInfo.userName = nickname;
+      cachedUserInfo.userRoleName = roleLabel;
+      
+      // 保留当前头像（无论是否更新）
+      const currentAvatar = this.data.userInfo.avatarUrl || wx.getStorageSync('avatarUrl');
+      if (currentAvatar) {
+        cachedUserInfo.avatarUrl = currentAvatar;
+        wx.setStorageSync('avatarUrl', currentAvatar);
+      }
+      
+      wx.setStorageSync('userInfo', cachedUserInfo);
+
+      console.log('缓存已更新:', { nickname, roleLabel });
 
       wx.showToast({
         title: '保存成功',
@@ -289,8 +403,8 @@ Page({
         showEditSheet: false
       });
 
-      // 重新加载用户信息
-      this.loadUserInfo();
+      // 重新加载用户信息（异步执行）
+      await this.loadUserInfo();
     } catch (err) {
       console.error('保存失败:', err);
       this.setData({ saving: false });
