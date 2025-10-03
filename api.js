@@ -72,11 +72,14 @@ const api = {
     userRole,
     userAvatarBase64
   }, {}),
-  // 加入家庭
-  joinHome: (token, homeCode) => request('/api/', 'POST', {}, {
+  // 加入家庭（已废弃，请使用 userJoinHome）
+  userJoinHome: (token, userRole, userName, homeCode, avatarBase64 = '') => request('/api/user/joinHome', 'POST', {
     token,
-    homeCode
-  }),
+    userRole,
+    userName,
+    homeCode,
+    avatarBase64
+  }, {}),
   // 创建家庭
   createHome: (token, userRole, userName, homeName, avatarBase64 = '') => request('/api/home/createHome', 'POST', {
     token,
@@ -146,15 +149,6 @@ const api = {
       });
     });
   },
-
-  // 更新用户资料（角色与昵称）
-  userJoinHome: (token, userRole, userName, homeCode, avatarBase64 = '') => request('/api/user/joinHome', 'POST', {
-    token,
-    userRole,
-    userName,
-    homeCode,
-    avatarBase64
-  }, {}),
 
   // 提交表单数据
   submitForm: (formData) => request('/form/submit', 'POST', formData)

@@ -184,7 +184,12 @@ Page({
 
       // 5. 保存用户信息到缓存
       wx.setStorageSync('userInfo', user);
-
+      
+      // 6. 判断用户信息中是否存在昵称和头像，如果有则更新到缓存
+      if (user.userName) {
+        wx.setStorageSync('nickname', user.userName);
+      }
+   
       wx.showToast({
         title: '登录成功'
       });

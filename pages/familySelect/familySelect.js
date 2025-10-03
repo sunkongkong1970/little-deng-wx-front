@@ -333,18 +333,28 @@ Page({
       return;
     }
     
-    // 获取头像的base64字符串
+    // 获取头像的base64字符串（与 mine.js 保持一致的处理逻辑）
     let avatarBase64 = '';
     const avatarPath = this.data.userInfo.localAvatarUrl || this.data.userInfo.avatarUrl;
-    if (avatarPath && (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH))) {
-      try {
-        const fs = wx.getFileSystemManager();
-        const fileContent = fs.readFileSync(avatarPath, 'base64');
-        if (fileContent) {
-          avatarBase64 = fileContent;
+    
+    if (avatarPath) {
+      if (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH)) {
+        // 如果是本地文件路径，读取文件
+        try {
+          const fs = wx.getFileSystemManager();
+          const fileContent = fs.readFileSync(avatarPath, 'base64');
+          if (fileContent) {
+            avatarBase64 = fileContent;
+          }
+        } catch (err) {
+          console.error('读取头像文件失败:', err);
         }
-      } catch (err) {
-        console.error('读取头像文件失败:', err);
+      } else if (avatarPath.startsWith('data:image')) {
+        // 如果是已格式化的 base64，提取纯 base64 部分
+        const base64Match = avatarPath.match(/base64,(.+)/);
+        if (base64Match && base64Match[1]) {
+          avatarBase64 = base64Match[1];
+        }
       }
     }
     
@@ -375,7 +385,9 @@ Page({
     const submittingOption = this.data.roleOptions.find(opt => opt.value === this.data.rolePickerValue[0]);
     console.log('根据 rolePickerValue 找到的选项:', submittingOption);
       
-      api.createHome(token, this.data.rolePickerValue[0], this.data.userInfo.nickName, this.data.familyName, avatarBase64).then(async () => {
+      api.createHome(token, this.data.rolePickerValue[0], this.data.userInfo.nickName, this.data.familyName, avatarBase64).then(async (res) => {
+        console.log('创建家庭接口返回:', res);
+        
         // 创建成功后重新获取用户信息并刷新缓存
         try {
           const userRes = await api.getUserInfo(token);
@@ -397,17 +409,66 @@ Page({
           console.error('获取用户信息失败:', error);
         }
         
-        wx.showToast({ title: '家庭创建成功' });
+        // 更新昵称和头像缓存（与加入家庭保持一致）
+        wx.setStorageSync('nickname', nickname);
+        
+        // 如果有头像数据，保存本地路径
+        const localAvatarPath = this.data.userInfo.localAvatarUrl;
+        if (localAvatarPath && (localAvatarPath.startsWith('wxfile://') || localAvatarPath.startsWith(wx.env.USER_DATA_PATH))) {
+          wx.setStorageSync('localAvatarPath', localAvatarPath);
+          console.log('本地头像路径已缓存:', localAvatarPath);
+        }
+        
+        wx.showToast({ 
+          title: '家庭创建成功',
+          icon: 'success',
+          duration: 1500
+        });
+        
         this.setData({ showSheet: false, saving: false });
-        wx.switchTab({ url:'/pages/baby/baby' });
+        
+        // 延迟跳转，让用户看到成功提示
+        setTimeout(() => {
+          wx.switchTab({ url: '/pages/baby/baby' });
+        }, 1500);
       }).catch(err => {
+        console.error('创建家庭失败:', err);
         this.setData({ saving: false });
         wx.showToast({
-          title: (err && err.message) || '创建家庭失败',
-          icon: 'none'
+          title: err.message || '创建家庭失败',
+          icon: 'none',
+          duration: 2000
         });
       });
     } else {
+      // 加入家庭
+      console.log('=== 提交加入家庭 ===');
+      console.log('邀请码:', homeCode);
+      console.log('当前 rolePickerValue:', this.data.rolePickerValue);
+      console.log('当前 roleLabel:', this.data.roleLabel);
+      console.log('即将提交的角色 ID:', this.data.rolePickerValue[0]);
+      console.log('昵称:', this.data.userInfo.nickName);
+      console.log('头像数据长度:', avatarBase64 ? avatarBase64.length : 0);
+      
+      // 验证必填项
+      if (!homeCode || homeCode.length < 6) {
+        this.setData({ saving: false });
+        wx.showToast({
+          title: '请输入正确的邀请码',
+          icon: 'none'
+        });
+        return;
+      }
+      
+      if (!this.data.rolePickerValue || !this.data.rolePickerValue[0]) {
+        this.setData({ saving: false });
+        wx.showToast({
+          title: '请选择您的角色',
+          icon: 'none'
+        });
+        return;
+      }
+      
       api.userJoinHome(
         token,
         this.data.rolePickerValue[0],
@@ -415,16 +476,7 @@ Page({
         homeCode,
         avatarBase64
       ).then(async (res) => {
-        if (res && typeof res.code !== 'undefined' && res.code !== 0) {
-          this.setData({
-            saving: false
-          });
-          wx.showToast({
-            title: res.message || '加入失败',
-            icon: 'none'
-          });
-          return;
-        }
+        console.log('加入家庭接口返回:', res);
         
         // 加入成功后重新获取用户信息并刷新缓存
         try {
@@ -447,30 +499,49 @@ Page({
           console.error('获取用户信息失败:', error);
         }
         
-        const localAvatarPath = this.data.userInfo.localAvatarUrl || wx.getStorageSync('localAvatarPath') || '';
+        // 更新昵称和头像缓存（与 mine.js 保持一致）
+        wx.setStorageSync('nickname', nickname);
+        
+        // 如果有头像数据，保存本地路径
+        const localAvatarPath = this.data.userInfo.localAvatarUrl;
+        if (localAvatarPath && (localAvatarPath.startsWith('wxfile://') || localAvatarPath.startsWith(wx.env.USER_DATA_PATH))) {
+          wx.setStorageSync('localAvatarPath', localAvatarPath);
+          console.log('本地头像路径已缓存:', localAvatarPath);
+        }
+        
+        // 为兼容性保留旧的 profile 缓存
         wx.setStorageSync('profile', {
           roleName,
           nickname,
-          avatarLocal: localAvatarPath
+          avatarLocal: localAvatarPath || ''
         });
+        
         wx.showToast({
-          title: '已保存'
+          title: '加入家庭成功',
+          icon: 'success',
+          duration: 1500
         });
+        
         this.setData({
           showSheet: false,
           saving: false
         });
-        // 继续加入家庭流程
-        wx.navigateTo({
-          url: '/pages/baby/baby'
-        });
+        
+        // 延迟跳转，让用户看到成功提示
+        setTimeout(() => {
+          wx.switchTab({
+            url: '/pages/baby/baby'
+          });
+        }, 1500);
       }).catch(err => {
+        console.error('加入家庭失败:', err);
         this.setData({
           saving: false
         });
         wx.showToast({
-          title: (err && err.message) || '保存失败',
-          icon: 'none'
+          title: err.message || '加入家庭失败',
+          icon: 'none',
+          duration: 2000
         });
       });
     }
