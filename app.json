@@ -6,8 +6,8 @@
     "pages/babyDetail/babyDetail",
     "pages/apps/apps",
     "pages/moment/moment",
+    "pages/momentPublish/momentPublish",
     "pages/mine/mine",
-    "pages/inviteCode/inviteCode",
     "pages/authLogin/authLogin",
     "pages/index/index",
     "pages/image-cropper/image-cropper"
@@ -62,13 +62,22 @@
     "t-picker": "miniprogram_npm/tdesign-miniprogram/picker/picker",
     "t-picker-item": "miniprogram_npm/tdesign-miniprogram/picker-item/picker-item",
     "t-icon": "miniprogram_npm/tdesign-miniprogram/icon/icon",
-    "t-textarea": "miniprogram_npm/tdesign-miniprogram/textarea/textarea"
+    "t-textarea": "miniprogram_npm/tdesign-miniprogram/textarea/textarea",
+    "t-divider": "miniprogram_npm/tdesign-miniprogram/divider/divider"
   },
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "亲子时光",
     "navigationBarBackgroundColor": "#ffffff"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "获取您的位置信息，用于记录宝宝成长时刻的地理位置"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ],
   "style": "v2",
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",

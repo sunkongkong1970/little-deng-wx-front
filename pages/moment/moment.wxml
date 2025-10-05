@@ -1,20 +1,71 @@
 <view class="page">
-	<view class="publisher">
-		<view class="row">
-			<t-avatar size="36"></t-avatar>
-			<t-input value="{{content}}" placeholder="分享宝宝的美好时光..." bindchange="onContentChange" />
-			<t-button theme="primary" disabled="{{!canPost}}" bindtap="onPost">发布</t-button>
+	<!-- 个人信息头部 -->
+	<view class="profile-header">
+		<image class="cover-image" src="{{coverImage}}" mode="aspectFill"></image>
+		<view class="user-info-box">
+			<text class="user-nickname">{{userNickname}}</text>
+			<t-avatar size="64" class="user-avatar" image="{{userAvatar}}"></t-avatar>
 		</view>
-		<text class="annotation">点击输入框 → 展开发布面板（上传图片 / 选择位置）</text>
+		<!-- 相机按钮 -->
+		<view class="camera-btn" bindtap="goToPublish">
+			<t-icon name="camera" size="24px" color="#fff" />
+		</view>
 	</view>
-	<view class="feed">
-		<block wx:for="{{posts}}" wx:key="index">
-			<view class="post">
-				<view class="head"><t-avatar size="36"></t-avatar><text class="nick">{{item.nick}}</text></view>
-				<view class="content">{{item.text}}</view>
-				<view class="meta">{{item.time}} <text wx:if="{{item.loc}}">📍 {{item.loc}}</text></view>
-				<view class="actions-row"><text bindtap="noop">👍 赞</text><text bindtap="noop">💬 评论</text></view>
+	
+	<!-- 朋友圈动态列表 -->
+	<view class="moments-list">
+		<block wx:for="{{posts}}" wx:key="id">
+			<view class="moment-item">
+				<view class="moment-avatar">
+					<t-avatar size="40" class="avatar"></t-avatar>
+				</view>
+				<view class="moment-main">
+					<view class="moment-header">
+						<text class="nickname">{{item.nick}}</text>
+					</view>
+					
+					<view class="moment-content">
+						<text class="content-text">{{item.text}}</text>
+					</view>
+					
+					<!-- 图片展示区域 -->
+					<view class="moment-images" wx:if="{{item.images && item.images.length > 0}}">
+						<block wx:for="{{item.images}}" wx:key="index" wx:for-item="img">
+							<image 
+								class="moment-image moment-image-{{item.images.length}}" 
+								src="{{img}}" 
+								mode="aspectFill"
+								bindtap="previewImage"
+								data-urls="{{item.images}}"
+								data-current="{{img}}"
+							/>
+						</block>
+					</view>
+					
+					<view class="moment-location" wx:if="{{item.loc}}">
+						<t-icon name="location" size="12px" color="#586C94" />
+						<text class="location-text">{{item.loc}}</text>
+					</view>
+					
+					<view class="moment-time">{{item.time}}</view>
+					
+					<view class="moment-footer">
+						<view class="action-item {{item.liked ? 'liked' : ''}}" bindtap="onLike" data-index="{{index}}">
+							<t-icon name="{{item.liked ? 'thumb-up-filled' : 'thumb-up'}}" size="16px" color="{{item.liked ? '#576B95' : '#999'}}" />
+							<text class="action-count" wx:if="{{item.likeCount > 0}}">{{item.likeCount}}</text>
+						</view>
+						<view class="action-item" bindtap="onComment" data-index="{{index}}">
+							<t-icon name="chat" size="16px" color="#999" />
+						</view>
+					</view>
+				</view>
 			</view>
 		</block>
+		
+		<!-- 空状态提示 -->
+		<view class="empty-tip" wx:if="{{posts.length === 0}}">
+			<t-icon name="info-circle" size="64px" color="#ddd" />
+			<text class="empty-text">还没有朋友圈动态</text>
+		</view>
 	</view>
 </view>

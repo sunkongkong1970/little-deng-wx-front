@@ -1,0 +1,80 @@
+<view class="page-container">
+	<!-- 内容编辑区 -->
+	<scroll-view class="content-area" scroll-y>
+		<!-- 文字输入区 -->
+		<textarea 
+			class="content-input"
+			placeholder="这一刻的想法..."
+			value="{{content}}"
+			bindinput="onContentChange"
+			maxlength="1000"
+			auto-height
+			show-confirm-bar="{{false}}"
+			cursor-spacing="20"
+		></textarea>
+
+		<!-- 图片网格区域 -->
+		<view class="image-section">
+			<view class="image-grid">
+				<block wx:for="{{images}}" wx:key="index">
+					<view class="image-item">
+						<image 
+							class="image" 
+							src="{{item}}" 
+							mode="aspectFill"
+							bindtap="previewImage"
+							data-index="{{index}}"
+						/>
+						<view class="delete-btn" bindtap="deleteImage" data-index="{{index}}">
+							<text class="delete-icon">×</text>
+						</view>
+					</view>
+				</block>
+				<!-- 添加图片按钮 -->
+				<view class="image-item add-image" wx:if="{{images.length < 9}}" bindtap="chooseImage">
+					<view class="add-icon">
+						<view class="add-line add-line-v"></view>
+						<view class="add-line add-line-h"></view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 位置选择区域 -->
+		<view class="location-section">
+			<view class="location-item" bindtap="chooseLocation">
+				<view class="location-left">
+					<text class="location-icon">📍</text>
+					<view class="location-info" wx:if="{{location}}">
+						<text class="location-name">{{location.name}}</text>
+						<text class="location-address" wx:if="{{location.address}}">{{location.address}}</text>
+					</view>
+					<text class="location-label" wx:else>所在位置</text>
+				</view>
+				<view class="location-right">
+					<text class="location-arrow" wx:if="{{!location}}">›</text>
+					<view class="location-close" wx:if="{{location}}" bindtap="clearLocation" catchtap="clearLocation">
+						<text class="close-icon">×</text>
+					</view>
+				</view>
+			</view>
+		</view>
+	</scroll-view>
+
+	<!-- 底部操作栏 -->
+	<view class="bottom-bar">
+		<t-button 
+			class="cancel-button" 
+			variant="base" 
+			size="medium"
+			bindtap="onCancel"
+		>取消</t-button>
+		<t-button 
+			class="publish-button" 
+			theme="primary" 
+			size="medium"
+			disabled="{{!canPublish}}"
+			bindtap="onPublish"
+		>发表</t-button>
+	</view>
+</view>

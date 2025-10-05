@@ -1,8 +1,0 @@
-<view class="page">
-	<view class="card">
-		<t-image width="200" height="200" src="/assets/sample-qrcode.png" />
-		<text class="code">邀请码：AB12CD</text>
-	</view>
-	<t-button theme="primary" block bindtap="onSave">保存图片</t-button>
-	<t-toast id="toast" />
-</view>

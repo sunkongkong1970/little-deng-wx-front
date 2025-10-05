@@ -1,0 +1,282 @@
+/* 页面容器 - 固定高度占满整个屏幕 */
+page {
+	width: 100%;
+	height: 100%;
+	background: #EDEDED;
+}
+
+.page-container {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background: #EDEDED;
+}
+
+/* 内容编辑区 - 占据剩余空间 */
+.content-area {
+	flex: 1;
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	box-sizing: border-box;
+}
+
+/* 文字输入区 */
+.content-input {
+	width: 100%;
+	min-height: 160px;
+	padding: 20px 16px;
+	font-size: 17px;
+	line-height: 1.6;
+	color: #333;
+	box-sizing: border-box;
+}
+
+/* 图片区域 */
+.image-section {
+	width: 100%;
+	padding: 0 16px 16px;
+	background: #fff;
+	box-sizing: border-box;
+}
+
+/* 图片网格 */
+.image-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
+}
+
+.image-item {
+	position: relative;
+	width: 100%;
+	padding-bottom: 100%;
+	background: #f5f5f5;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.image-item .image {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 8px;
+}
+
+/* 添加图片按钮 */
+.image-item.add-image {
+	border: 2px dashed #D1D1D1;
+	background: #FAFAFA;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.add-image:active {
+	background: #F0F0F0;
+	border-color: #BFBFBF;
+}
+
+/* 自定义加号图标 - 绝对定位居中 */
+.add-icon {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.add-line {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	background: #BFBFBF;
+	transition: all 0.2s;
+}
+
+.add-line-v {
+	width: 3px;
+	height: 24px;
+	border-radius: 2px;
+	transform: translate(-50%, -50%);
+}
+
+.add-line-h {
+	width: 24px;
+	height: 3px;
+	border-radius: 2px;
+	transform: translate(-50%, -50%);
+}
+
+.add-image:active .add-line {
+	background: #999;
+}
+
+/* 删除按钮 */
+.delete-btn {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	width: 26px;
+	height: 26px;
+	background: rgba(0, 0, 0, 0.65);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10;
+	transition: all 0.2s;
+}
+
+.delete-btn:active {
+	background: rgba(0, 0, 0, 0.85);
+	transform: scale(0.92);
+}
+
+.delete-icon {
+	font-size: 22px;
+	color: #fff;
+	font-weight: 300;
+	line-height: 1;
+	margin-top: -2px;
+}
+
+/* 位置选择区域 */
+.location-section {
+	width: 100%;
+	background: #fff;
+	padding: 0 16px;
+	border-top: 1px solid #ECECEC;
+	box-sizing: border-box;
+}
+
+.location-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 0;
+	background: #fff;
+	transition: all 0.2s;
+}
+
+.location-item:active {
+	opacity: 0.7;
+}
+
+.location-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 1;
+	overflow: hidden;
+}
+
+.location-icon {
+	font-size: 20px;
+	flex-shrink: 0;
+}
+
+.location-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+	overflow: hidden;
+}
+
+.location-name {
+	font-size: 16px;
+	color: #333;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.location-address {
+	font-size: 12px;
+	color: #999;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.location-label {
+	font-size: 16px;
+	color: #333;
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.location-right {
+	display: flex;
+	align-items: center;
+	padding-left: 12px;
+}
+
+.location-arrow {
+	font-size: 24px;
+	color: #C7C7C7;
+	font-weight: 300;
+}
+
+.location-close {
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.08);
+	border-radius: 50%;
+	transition: all 0.2s;
+}
+
+.location-close:active {
+	background: rgba(0, 0, 0, 0.15);
+}
+
+.close-icon {
+	font-size: 20px;
+	color: #666;
+	font-weight: 300;
+	line-height: 1;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+	width: 100%;
+	display: flex;
+	gap: 12px;
+	padding: 10px 16px;
+	background: #fff;
+	border-top: 1px solid #ECECEC;
+	box-sizing: border-box;
+	padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+.cancel-button,
+.publish-button {
+	flex: 1;
+	height: 40px !important;
+	border-radius: 6px !important;
+	font-size: 15px !important;
+}
+
+.cancel-button {
+	--td-button-default-border-color: #CDCDCD;
+	--td-button-default-color: #333;
+	--td-button-default-bg-color: #E0E0E0;
+}
+
+.publish-button {
+	--td-button-primary-bg-color: #07C160;
+	--td-button-primary-disabled-bg-color: #BFBFBF;
+}
