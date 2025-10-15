@@ -306,7 +306,7 @@ Page({
       }
     });
   },
-  onConfirmProfile() {
+  async onConfirmProfile() {
     if (this.data.saving) return;
     const roleLabel = this.data.roleLabel;
     const roleName = roleLabel || '';
@@ -385,7 +385,20 @@ Page({
     const submittingOption = this.data.roleOptions.find(opt => opt.value === this.data.rolePickerValue[0]);
     console.log('根据 rolePickerValue 找到的选项:', submittingOption);
       
-      api.createHome(token, this.data.rolePickerValue[0], this.data.userInfo.nickName, this.data.familyName, avatarBase64).then(async (res) => {
+      // 先上传头像获取URL
+      let avatarUrl = '';
+      if (avatarPath && (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH))) {
+        try {
+          console.log('开始上传头像...');
+          avatarUrl = await api.uploadImageFile(token, 'USER_AVATAR', avatarPath);
+          console.log('头像上传成功，URL:', avatarUrl);
+        } catch (uploadErr) {
+          console.error('上传头像失败:', uploadErr);
+          // 上传失败不阻断流程，继续提交
+        }
+      }
+      
+      api.createHome(token, this.data.rolePickerValue[0], this.data.userInfo.nickName, this.data.familyName, avatarBase64, avatarUrl).then(async (res) => {
         console.log('创建家庭接口返回:', res);
         
         // 创建成功后重新获取用户信息并刷新缓存
@@ -469,12 +482,26 @@ Page({
         return;
       }
       
+      // 先上传头像获取URL
+      let avatarUrl = '';
+      if (avatarPath && (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH))) {
+        try {
+          console.log('开始上传头像...');
+          avatarUrl = await api.uploadImageFile(token, 'USER_AVATAR', avatarPath);
+          console.log('头像上传成功，URL:', avatarUrl);
+        } catch (uploadErr) {
+          console.error('上传头像失败:', uploadErr);
+          // 上传失败不阻断流程，继续提交
+        }
+      }
+      
       api.userJoinHome(
         token,
         this.data.rolePickerValue[0],
         this.data.userInfo.nickName,
         homeCode,
-        avatarBase64
+        avatarBase64,
+        avatarUrl
       ).then(async (res) => {
         console.log('加入家庭接口返回:', res);
         

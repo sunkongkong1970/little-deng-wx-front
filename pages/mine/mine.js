@@ -365,15 +365,30 @@ Page({
         }
       }
 
+      // 先上传头像获取URL（仅当有新头像时）
+      let avatarUrl = '';
+      if (hasNewAvatar && avatarPath && (avatarPath.startsWith('wxfile://') || avatarPath.startsWith(wx.env.USER_DATA_PATH))) {
+        try {
+          console.log('开始上传头像...');
+          avatarUrl = await api.uploadImageFile(token, 'USER_AVATAR', avatarPath);
+          console.log('头像上传成功，URL:', avatarUrl);
+        } catch (uploadErr) {
+          console.error('上传头像失败:', uploadErr);
+          // 上传失败不阻断流程，继续提交
+        }
+      }
+      
       // 调用更新接口（使用 editUser 接口更新资料）
       console.log('调用 editUser 接口，roleId:', this.data.rolePickerValue[0]);
       console.log('头像数据:', hasNewAvatar ? '有新头像' : (avatarBase64 ? '使用已有头像' : '无头像'));
+      console.log('头像URL:', avatarUrl || '无');
       
       await api.editUser(
         token,
         nickname,
         this.data.rolePickerValue[0],
-        avatarBase64
+        avatarBase64,
+        avatarUrl
       );
 
       // 更新缓存
@@ -417,17 +432,7 @@ Page({
 
   // 打开邀请码弹窗
   async onShowInviteCode() {
-    // 先检查缓存中是否有邀请码
-    const cachedCode = wx.getStorageSync('inviteCode');
-    if (cachedCode) {
-      this.setData({
-        inviteCode: cachedCode,
-        showInviteSheet: true
-      });
-    } else {
-      // 没有缓存则生成新的
-      await this.generateInviteCode();
-    }
+    await this.generateInviteCode();
   },
 
   // 生成邀请码
@@ -438,11 +443,8 @@ Page({
 
     try {
       const token = wx.getStorageSync('token') || '';
-      const code = await api.generateCode(token);
-      
-      // 保存到缓存
-      wx.setStorageSync('inviteCode', code);
-      
+      const code = await api.getHomeCode(token);
+    
       this.setData({
         inviteCode: code,
         showInviteSheet: true,

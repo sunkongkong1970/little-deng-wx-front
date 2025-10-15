@@ -27,13 +27,26 @@ function request(url, method = 'GET', data = {}, params = {}) {
             if (body.code === 0) {
               // 业务成功：优先返回 data，否则返回整个 body
               resolve(typeof body.data === 'undefined' ? body : body.data);
-            } else {
-              const message = (body && (body.message || body.msg || body.error)) || '业务异常';
-              const error = new Error(`[${body.code}] ${message}`);
-              error.code = body.code;
-              error.response = body;
-              reject(error);
+          } else {
+            const message = (body && (body.message || body.msg || body.error)) || '业务异常';
+            const error = new Error(`[${body.code}] ${message}`);
+            error.code = body.code;
+            error.response = body;
+            
+            // 处理登录过期（504错误）
+            if (body.code === 504) {
+              // 清除本地token
+              wx.removeStorageSync('token');
+              wx.removeStorageSync('userInfo');
+              
+              // 跳转到baby页面并显示登录弹窗
+              wx.reLaunch({
+                url: '/pages/baby/baby?showAuth=true'
+              });
             }
+            
+            reject(error);
+          }
           } else {
             // 未按约定返回 code 字段，则原样返回
             resolve(body);
@@ -66,27 +79,30 @@ const api = {
     token
   }),
   //编辑用户
-  editUser: (token, userName, userRole, userAvatarBase64 = '') => request('/api/user/edit', 'POST', {
+  editUser: (token, userName, userRole, userAvatarBase64 = '', userAvatarUrl = '') => request('/api/user/edit', 'POST', {
     token,
     userName,
     userRole,
-    userAvatarBase64
+    userAvatarBase64,
+    userAvatarUrl
   }, {}),
   // 加入家庭（已废弃，请使用 userJoinHome）
-  userJoinHome: (token, userRole, userName, homeCode, avatarBase64 = '') => request('/api/user/joinHome', 'POST', {
+  userJoinHome: (token, userRole, userName, homeCode, userAvatarBase64 = '', userAvatarUrl = '') => request('/api/user/joinHome', 'POST', {
     token,
     userRole,
     userName,
     homeCode,
-    avatarBase64
+    userAvatarBase64,
+    userAvatarUrl
   }, {}),
   // 创建家庭
-  createHome: (token, userRole, userName, homeName, avatarBase64 = '') => request('/api/home/createHome', 'POST', {
+  createHome: (token, userRole, userName, homeName, userAvatarBase64 = '', userAvatarUrl = '') => request('/api/home/createHome', 'POST', {
     token,
     userRole,
     userName,
     homeName,
-    avatarBase64
+    userAvatarBase64,
+    userAvatarUrl
   }, {}),
   // 角色选项（下拉框）
   getRoleOptions: (type) => request('/api/dict/dictList', 'GET', {
@@ -110,7 +126,7 @@ const api = {
   }),
 
    //获取邀请码
-   generateCode: (token) => request('/api/home/generateCode', 'GET', {}, {
+   getHomeCode: (token) => request('/api/home/getHomeCode', 'GET', {}, {
     token
   }),
 

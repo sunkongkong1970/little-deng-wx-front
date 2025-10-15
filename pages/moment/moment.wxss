@@ -1,130 +1,163 @@
 /* 页面容器 */
 .page {
 	min-height: 100vh;
-	background: #EDEDED;
-	padding-bottom: env(safe-area-inset-bottom);
+	background: #f5f5f5;
+	padding-bottom: calc(env(safe-area-inset-bottom) + 32rpx);
 }
 
-/* 个人信息头部 */
-.profile-header {
+/* 个人信息头部卡片 */
+.profile-card {
+	position: relative;
+	margin: 32rpx;
+	margin-bottom: 24rpx;
+	border-radius: 24rpx;
+	overflow: hidden;
+	background: #fff;
+	box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.cover-container {
 	position: relative;
 	width: 100%;
-	height: 400rpx;
-	background: #f5f5f5;
-	margin-bottom: 8px;
+	height: 320rpx;
+	overflow: hidden;
 }
 
 .cover-image {
 	width: 100%;
 	height: 100%;
-	display: block;
 }
 
-.user-info-box {
+.overlay {
 	position: absolute;
-	bottom: 20rpx;
-	right: 20rpx;
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 12rpx;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
 }
 
-.user-nickname {
-	font-size: 17px;
-	font-weight: 600;
-	color: #fff;
-	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+.user-info-container {
+	position: absolute;
+	bottom: 24rpx;
+	left: 24rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+	z-index: 2;
 }
 
 .user-avatar {
-	border: 3px solid #fff;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	border: 4rpx solid #fff;
+	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 }
 
-/* 相机按钮 */
-.camera-btn {
+.user-nickname {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #fff;
+	text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.5);
+}
+
+/* 发布按钮 */
+.publish-btn {
 	position: absolute;
-	top: 20rpx;
-	right: 20rpx;
-	width: 80rpx;
-	height: 80rpx;
-	background: rgba(0, 0, 0, 0.4);
+	top: 24rpx;
+	right: 24rpx;
+	width: 88rpx;
+	height: 88rpx;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	transition: all 0.2s;
+	box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
+	transition: all 0.3s ease;
+	z-index: 2;
 }
 
-.camera-btn:active {
-	background: rgba(0, 0, 0, 0.6);
-	transform: scale(0.95);
+.publish-btn:active {
+	transform: scale(0.92);
+	box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
 }
 
-/* 朋友圈列表 */
-.moments-list {
-	padding-bottom: 20px;
+/* 朋友圈列表容器 */
+.moments-container {
+	padding: 0 32rpx;
 }
 
-/* 朋友圈单项 */
-.moment-item {
-	display: flex;
-	padding: 16px 12px;
+/* 朋友圈卡片 */
+.moment-card {
 	background: #fff;
-	border-bottom: 1px solid #E5E5E5;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	margin-bottom: 24rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+	transition: all 0.3s ease;
 }
 
-.moment-avatar {
-	width: 40px;
-	height: 40px;
-	margin-right: 12px;
-	flex-shrink: 0;
-}
-
-.moment-main {
-	flex: 1;
-	min-width: 0;
+.moment-card:active {
+	transform: translateY(-2rpx);
+	box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
 }
 
 /* 朋友圈头部 */
 .moment-header {
-	margin-bottom: 4px;
+	margin-bottom: 24rpx;
 }
 
-.nickname {
-	font-size: 15px;
+.user-section {
+	display: flex;
+	align-items: center;
+	gap: 20rpx;
+}
+
+.moment-avatar {
+	flex-shrink: 0;
+}
+
+.user-info {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+	flex: 1;
+}
+
+.user-name {
+	font-size: 30rpx;
 	font-weight: 600;
-	color: #576B95;
-	line-height: 1.4;
+	color: #333;
+}
+
+.post-time {
+	font-size: 24rpx;
+	color: #999;
 }
 
 /* 朋友圈内容 */
 .moment-content {
-	margin-bottom: 8px;
+	margin-bottom: 24rpx;
 }
 
 .content-text {
-	font-size: 16px;
-	color: #000;
-	line-height: 1.5;
+	font-size: 30rpx;
+	color: #333;
+	line-height: 1.6;
 	word-break: break-all;
 }
 
 /* 图片展示 */
 .moment-images {
 	display: grid;
-	gap: 4px;
-	margin: 8px 0;
+	gap: 12rpx;
+	margin-bottom: 24rpx;
 }
 
 /* 1张图片 */
 .moment-images .moment-image-1 {
 	width: 100%;
-	max-width: 240px;
-	height: 240px;
+	max-width: 480rpx;
+	height: 480rpx;
 }
 
 /* 2-4张图片 */
@@ -138,9 +171,7 @@
 .moment-image-3,
 .moment-image-4 {
 	width: 100%;
-	height: 0;
-	padding-bottom: 100%;
-	position: relative;
+	height: 320rpx;
 }
 
 /* 5-9张图片 */
@@ -158,75 +189,78 @@
 .moment-image-8,
 .moment-image-9 {
 	width: 100%;
-	height: 0;
-	padding-bottom: 100%;
-	position: relative;
-}
-
-.moment-image {
-	border-radius: 4px;
-	background: #f5f5f5;
+	height: 200rpx;
 }
 
 /* 位置信息 */
 .moment-location {
 	display: flex;
 	align-items: center;
-	gap: 2px;
-	margin: 8px 0 4px;
+	gap: 8rpx;
+	margin-bottom: 24rpx;
+	padding: 12rpx 20rpx;
+	background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+	border-radius: 12rpx;
+	width: fit-content;
 }
 
 .location-text {
-	font-size: 13px;
-	color: #586C94;
+	font-size: 26rpx;
+	color: #0052d9;
+	font-weight: 500;
 }
 
-/* 时间 */
-.moment-time {
-	font-size: 13px;
-	color: #999;
-	margin-top: 4px;
-	margin-bottom: 8px;
-}
-
-/* 底部操作 */
-.moment-footer {
+/* 底部操作按钮 */
+.moment-actions {
 	display: flex;
-	gap: 20px;
+	justify-content: space-around;
 	align-items: center;
-	padding-top: 4px;
+	padding-top: 16rpx;
 }
 
 .action-item {
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 4px;
-	padding: 4px 0;
-	transition: opacity 0.2s;
+	gap: 12rpx;
+	padding: 16rpx 32rpx;
+	border-radius: 16rpx;
+	transition: all 0.3s ease;
+	flex: 1;
 }
 
 .action-item:active {
-	opacity: 0.6;
+	background: #f5f5f5;
+	transform: scale(0.95);
 }
 
-.action-count {
-	font-size: 13px;
-	color: #999;
+.action-item.liked {
+	background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+.action-text {
+	font-size: 24rpx;
+	color: #666;
+	font-weight: 500;
+}
+
+.action-text.active {
+	color: #0052d9;
+	font-weight: 600;
 }
 
 /* 空状态 */
-.empty-tip {
+.empty-container {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 120px 20px;
-	gap: 16px;
+	padding: 120rpx 40rpx;
 	background: #fff;
+	border-radius: 24rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
-.empty-text {
-	font-size: 15px;
-	color: #999;
-	text-align: center;
+/* 分割线自定义样式 */
+.moment-card t-divider {
+	margin: 24rpx 0;
 }

@@ -12,13 +12,17 @@ Page({
     babyList: [] // 宝宝列表
   },
 
-  async onLoad() {
+  async onLoad(options) {
     this.setData({
       errorMsg: ''
     });
+    
+    // 检查是否从登录过期跳转过来
+    const showAuth = options && options.showAuth === 'true';
+    
     try {
       const token = wx.getStorageSync('token');
-      if (token) {
+      if (token && !showAuth) {
         const res = await api.getUserInfo(token);
         console.log(res)
         if (!res) {
@@ -28,10 +32,19 @@ Page({
         // 加载宝宝列表
         await this.loadBabyList();
       } else {
-        // 用户未登录，显示登录弹窗
+        // 用户未登录或登录过期，显示登录弹窗
         this.setData({
           authVisible: true
         });
+        
+        // 如果是登录过期，显示提示
+        if (showAuth) {
+          wx.showToast({
+            title: '登录已过期，请重新登录',
+            icon: 'none',
+            duration: 2000
+          });
+        }
       }
     } catch (e) {
       console.error('登录检查失败:', e);
