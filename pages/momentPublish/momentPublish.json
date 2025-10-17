@@ -1,7 +1,5 @@
 {
   "navigationBarTitleText": "发表动态",
-  "navigationBarTextStyle": "white",
-  "navigationBarBackgroundColor": "#393A3F",
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button"
   }

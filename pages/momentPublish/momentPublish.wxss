@@ -280,3 +280,14 @@ page {
 	--td-button-primary-bg-color: #07C160;
 	--td-button-primary-disabled-bg-color: #BFBFBF;
 }
+
+/* 位置选择遮罩层 */
+.location-mask {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 9999;
+	background: rgba(0, 0, 0, 0.3);
+}

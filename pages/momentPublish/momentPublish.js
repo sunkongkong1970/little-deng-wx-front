@@ -1,9 +1,12 @@
+import api from '../../api.js';
+
 Page({
 	data: {
 		content: '',
 		images: [],
 		location: null,
-		canPublish: false
+		canPublish: false,
+		isChoosingLocation: false // 正在选择位置
 	},
 
 	onLoad(options) {
@@ -115,6 +118,11 @@ Page({
 	 * 打开位置选择器
 	 */
 	openLocationPicker() {
+		// 显示遮罩层，防止点击底部按钮
+		this.setData({
+			isChoosingLocation: true
+		});
+
 		wx.chooseLocation({
 			success: (res) => {
 				console.log('选择位置成功：', res);
@@ -127,7 +135,8 @@ Page({
 				};
 				
 				this.setData({
-					location
+					location,
+					isChoosingLocation: false
 				});
 
 				wx.showToast({
@@ -138,6 +147,11 @@ Page({
 			},
 			fail: (err) => {
 				console.log('选择位置失败：', err);
+				
+				// 关闭遮罩层
+				this.setData({
+					isChoosingLocation: false
+				});
 				
 				// 处理各种错误情况
 				if (err.errMsg.indexOf('auth deny') !== -1 || err.errMsg.indexOf('authorize') !== -1) {
@@ -200,7 +214,7 @@ Page({
 	/**
 	 * 发布动态
 	 */
-	onPublish() {
+	async onPublish() {
 		if (!this.data.canPublish) {
 			wx.showToast({
 				title: '请输入内容或添加图片',
@@ -209,37 +223,54 @@ Page({
 			return;
 		}
 
-		// 准备发布数据
-		const publishData = {
-			content: this.data.content.trim(),
-			images: this.data.images,
-			location: this.data.location,
-			createTime: new Date().getTime()
-		};
+		try {
+			// 获取token和用户信息
+			const token = wx.getStorageSync('token');
+			if (!token) {
+				wx.showToast({
+					title: '请先登录',
+					icon: 'none'
+				});
+				return;
+			}
 
-		console.log('发布动态数据：', publishData);
+			const userInfo = wx.getStorageSync('userInfo');
+			if (!userInfo || !userInfo.homeId) {
+				wx.showToast({
+					title: '请先加入家庭',
+					icon: 'none'
+				});
+				return;
+			}
 
-		// 显示加载提示
-		wx.showLoading({
-			title: '发布中...',
-			mask: true
-		});
+			// 显示加载提示
+			wx.showLoading({
+				title: '发布中...',
+				mask: true
+			});
 
-		// TODO: 这里应该调用实际的 API 接口
-		// 例如：
-		// wx.request({
-		//   url: 'your-api-endpoint',
-		//   method: 'POST',
-		//   data: publishData,
-		//   success: (res) => { ... },
-		//   fail: (err) => { ... }
-		// });
+			// 上传图片并获取URL列表
+			const imgUrls = await this.uploadImages(token);
 
-		// 暂时模拟网络请求
-		setTimeout(() => {
+			// 准备发布数据
+			const photoWallData = {
+				homeId: userInfo.homeId,
+				childIds: '', // 可以在这里关联宝宝ID，暂时为空
+				content: this.data.content.trim(),
+				postTime: new Date().toISOString(),
+				location: this.data.location ? this.data.location.name : '',
+				imgUrls: imgUrls
+			};
+
+			console.log('发布照片墙数据：', photoWallData);
+
+			// 调用API创建照片墙
+			const photoWallId = await api.createPhotoWall(token, photoWallData);
+
 			wx.hideLoading();
-			
-			// 模拟发布成功
+
+			console.log('照片墙创建成功，ID:', photoWallId);
+
 			wx.showToast({
 				title: '发布成功',
 				icon: 'success',
@@ -254,16 +285,51 @@ Page({
 					const prevPage = pages[pages.length - 2];
 					if (prevPage.route === 'pages/moment/moment') {
 						// 通知上一页刷新数据
-						if (typeof prevPage.onShow === 'function') {
-							prevPage.setData({
-								needRefresh: true
-							});
+						if (typeof prevPage.loadPhotoWallList === 'function') {
+							prevPage.loadPhotoWallList(true);
 						}
 					}
 				}
 				wx.navigateBack();
 			}, 1500);
-		}, 1000);
+
+		} catch (error) {
+			wx.hideLoading();
+			console.error('发布失败：', error);
+			wx.showToast({
+				title: error.message || '发布失败，请重试',
+				icon: 'none',
+				duration: 2000
+			});
+		}
+	},
+
+	/**
+	 * 上传图片
+	 * @param {String} token 用户token
+	 * @returns {Promise<Array<String>>} 上传后的图片URL列表
+	 */
+	async uploadImages(token) {
+		const images = this.data.images;
+		if (!images || images.length === 0) {
+			return [];
+		}
+
+		const uploadPromises = images.map(async (imagePath) => {
+			try {
+				// 调用图片上传接口
+				const imageUrl = await api.uploadImageFile(token, 'DAILY', imagePath);
+				console.log('图片上传成功:', imageUrl);
+				return imageUrl;
+			} catch (error) {
+				console.error('图片上传失败:', error);
+				throw new Error('图片上传失败');
+			}
+		});
+
+		// 等待所有图片上传完成
+		const imgUrls = await Promise.all(uploadPromises);
+		return imgUrls;
 	},
 
 	/**

@@ -1,16 +1,16 @@
 <view class="page">
 	<!-- 个人信息头部卡片 -->
 	<view class="profile-card">
-		<view class="cover-container">
+		<view class="cover-container" bindtap="previewCoverImage">
 			<t-image class="cover-image" src="{{coverImage}}" mode="aspectFill" shape="round" />
 			<view class="overlay"></view>
 		</view>
 		<view class="user-info-container">
-			<t-avatar size="80rpx" class="user-avatar" image="{{userAvatar}}" shape="circle" />
+			<image class="user-avatar" src="{{userAvatar}}" mode="aspectFill" binderror="onAvatarError" bindload="onAvatarLoad" />
 			<text class="user-nickname">{{userNickname}}</text>
 		</view>
 		<!-- 发布按钮 -->
-		<view class="publish-btn" bindtap="goToPublish">
+		<view class="publish-btn" bindtap="goToPublish" catchtap="goToPublish">
 			<t-icon name="edit" size="40rpx" color="#fff" />
 		</view>
 	</view>
@@ -18,35 +18,35 @@
 	<!-- 朋友圈动态列表 -->
 	<view class="moments-container">
 		<block wx:for="{{posts}}" wx:key="id">
-			<view class="moment-card">
-				<view class="moment-header">
-					<view class="user-section">
-						<t-avatar size="80rpx" class="moment-avatar" shape="circle" />
-						<view class="user-info">
-							<text class="user-name">{{item.nick}}</text>
-							<text class="post-time">{{item.time}}</text>
-						</view>
+		<view class="moment-card">
+			<view class="moment-header">
+				<view class="user-section">
+					<image class="moment-avatar" src="{{item.avatar}}" mode="aspectFill" />
+					<view class="user-info">
+						<text class="user-name">{{item.nick}}</text>
+						<text class="post-time">{{item.time}}</text>
 					</view>
 				</view>
+			</view>
 				
 				<view class="moment-content">
 					<text class="content-text">{{item.text}}</text>
 				</view>
 				
-				<!-- 图片展示区域 -->
-				<view class="moment-images" wx:if="{{item.images && item.images.length > 0}}">
-					<block wx:for="{{item.images}}" wx:key="index" wx:for-item="img">
-						<t-image 
-							class="moment-image moment-image-{{item.images.length}}" 
-							src="{{img}}" 
-							mode="aspectFill"
-							shape="round"
-							bindtap="previewImage"
-							data-urls="{{item.images}}"
-							data-current="{{img}}"
-						/>
-					</block>
-				</view>
+			<!-- 图片展示区域 -->
+			<view class="moment-images" wx:if="{{item.images && item.images.length > 0}}">
+				<block wx:for="{{item.images.slice(0, 9)}}" wx:key="index" wx:for-item="img">
+					<t-image 
+						class="moment-image moment-image-grid" 
+						src="{{img}}" 
+						mode="aspectFill"
+						shape="round"
+						bindtap="previewImage"
+						data-urls="{{item.images}}"
+						data-current="{{img}}"
+					/>
+				</block>
+			</view>
 				
 				<view class="moment-location" wx:if="{{item.loc}}">
 					<t-icon name="location" size="24rpx" color="#0052d9" />
@@ -55,20 +55,16 @@
 				
 				<t-divider />
 				
-				<view class="moment-actions">
-					<view class="action-item {{item.liked ? 'liked' : ''}}" bindtap="onLike" data-index="{{index}}">
-						<t-icon name="{{item.liked ? 'thumb-up-filled' : 'thumb-up'}}" size="36rpx" color="{{item.liked ? '#0052d9' : '#999'}}" />
-						<text class="action-text {{item.liked ? 'active' : ''}}">{{item.likeCount > 0 ? item.likeCount : '赞'}}</text>
-					</view>
-					<view class="action-item" bindtap="onComment" data-index="{{index}}">
-						<t-icon name="chat" size="36rpx" color="#999" />
-						<text class="action-text">评论</text>
-					</view>
-					<view class="action-item">
-						<t-icon name="share" size="36rpx" color="#999" />
-						<text class="action-text">分享</text>
-					</view>
+			<view class="moment-actions">
+				<view class="action-item action-item-horizontal {{item.liked ? 'liked' : ''}}" bindtap="onLike" data-index="{{index}}">
+					<t-icon name="{{item.liked ? 'thumb-up-filled' : 'thumb-up'}}" size="36rpx" color="{{item.liked ? '#0052d9' : '#999'}}" />
+					<text class="action-text {{item.liked ? 'active' : ''}}">{{item.likeCount > 0 ? item.likeCount : '赞'}}</text>
 				</view>
+				<view class="action-item action-item-horizontal" bindtap="onComment" data-index="{{index}}">
+					<t-icon name="chat" size="36rpx" color="#999" />
+					<text class="action-text">评论</text>
+				</view>
+			</view>
 			</view>
 		</block>
 		

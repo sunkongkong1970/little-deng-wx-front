@@ -167,6 +167,38 @@ const api = {
   },
 
   // 提交表单数据
-  submitForm: (formData) => request('/form/submit', 'POST', formData)
+  submitForm: (formData) => request('/form/submit', 'POST', formData),
+
+  // ========== 照片墙相关接口 ==========
+  
+  // 获取照片墙列表（分页）
+  getPhotoWallList: (token, pageNum = 1, pageSize = 10) => request('/api/photo-wall/list', 'GET', {}, {
+    token,
+    pageNum,
+    pageSize
+  }),
+
+  // 创建照片墙
+  createPhotoWall: (token, photoWallData) => request('/api/photo-wall/create', 'POST', {
+    token,
+    homeId: photoWallData.homeId,
+    childIds: photoWallData.childIds,
+    content: photoWallData.content,
+    postTime: photoWallData.postTime,
+    location: photoWallData.location,
+    imgUrls: photoWallData.imgUrls
+  }),
+
+  // 点赞或取消点赞
+  togglePhotoWallLike: (token, photoWallId) => request('/api/photo-wall/like', 'POST', {
+    token,
+    photoWallId
+  }),
+
+  // 删除照片墙
+  deletePhotoWall: (token, photoWallId) => request('/api/photo-wall/delete', 'POST', {
+    token,
+    photoWallId
+  })
 };
 export default api;

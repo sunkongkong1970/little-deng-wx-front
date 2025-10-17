@@ -202,7 +202,12 @@ Page({
       if (user.userName) {
         wx.setStorageSync('nickname', user.userName);
       }
-   
+
+      if(user.userAvatarUrl){
+        wx.setStorage('avatarUrl',user.userAvatarUrl)
+      }
+      console.log("111"+user.userAvatarUrl)
+
       wx.showToast({
         title: '登录成功'
       });

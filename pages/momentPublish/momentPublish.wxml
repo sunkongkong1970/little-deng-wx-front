@@ -67,14 +67,18 @@
 			class="cancel-button" 
 			variant="base" 
 			size="medium"
+			disabled="{{isChoosingLocation}}"
 			bindtap="onCancel"
 		>取消</t-button>
 		<t-button 
 			class="publish-button" 
 			theme="primary" 
 			size="medium"
-			disabled="{{!canPublish}}"
+			disabled="{{!canPublish || isChoosingLocation}}"
 			bindtap="onPublish"
 		>发表</t-button>
 	</view>
+
+	<!-- 位置选择遮罩层 -->
+	<view class="location-mask" wx:if="{{isChoosingLocation}}"></view>
 </view>

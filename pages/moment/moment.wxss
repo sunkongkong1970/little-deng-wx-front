@@ -8,8 +8,9 @@
 /* 个人信息头部卡片 */
 .profile-card {
 	position: relative;
-	margin: 32rpx;
+	margin: 30rpx auto;
 	margin-bottom: 24rpx;
+	width: 700rpx;
 	border-radius: 24rpx;
 	overflow: hidden;
 	background: #fff;
@@ -18,14 +19,22 @@
 
 .cover-container {
 	position: relative;
-	width: 100%;
-	height: 320rpx;
+	width: 700rpx;
+	height: 400rpx;
 	overflow: hidden;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.cover-container:active {
+	opacity: 0.9;
+	transform: scale(0.99);
 }
 
 .cover-image {
 	width: 100%;
 	height: 100%;
+	object-fit: cover;
 }
 
 .overlay {
@@ -48,8 +57,14 @@
 }
 
 .user-avatar {
+	width: 80rpx;
+	height: 80rpx;
 	border: 4rpx solid #fff;
 	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+	border-radius: 50%;
+	overflow: hidden;
+	background: #f0f0f0;
+	flex-shrink: 0;
 }
 
 .user-nickname {
@@ -83,17 +98,22 @@
 
 /* 朋友圈列表容器 */
 .moments-container {
-	padding: 0 32rpx;
+	padding: 0 25rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 /* 朋友圈卡片 */
 .moment-card {
+	width: 700rpx;
 	background: #fff;
 	border-radius: 24rpx;
 	padding: 32rpx;
 	margin-bottom: 24rpx;
 	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 	transition: all 0.3s ease;
+	box-sizing: border-box;
 }
 
 .moment-card:active {
@@ -113,7 +133,12 @@
 }
 
 .moment-avatar {
+	width: 80rpx;
+	height: 80rpx;
 	flex-shrink: 0;
+	border-radius: 50%;
+	overflow: hidden;
+	background: #f0f0f0;
 }
 
 .user-info {
@@ -146,50 +171,20 @@
 	word-break: break-all;
 }
 
-/* 图片展示 */
+/* 图片展示 - 3x3网格布局 */
 .moment-images {
 	display: grid;
+	grid-template-columns: repeat(3, 1fr);
 	gap: 12rpx;
 	margin-bottom: 24rpx;
 }
 
-/* 1张图片 */
-.moment-images .moment-image-1 {
-	width: 100%;
-	max-width: 480rpx;
-	height: 480rpx;
-}
-
-/* 2-4张图片 */
-.moment-images:has(.moment-image-2),
-.moment-images:has(.moment-image-3),
-.moment-images:has(.moment-image-4) {
-	grid-template-columns: repeat(2, 1fr);
-}
-
-.moment-image-2,
-.moment-image-3,
-.moment-image-4 {
-	width: 100%;
-	height: 320rpx;
-}
-
-/* 5-9张图片 */
-.moment-images:has(.moment-image-5),
-.moment-images:has(.moment-image-6),
-.moment-images:has(.moment-image-7),
-.moment-images:has(.moment-image-8),
-.moment-images:has(.moment-image-9) {
-	grid-template-columns: repeat(3, 1fr);
-}
-
-.moment-image-5,
-.moment-image-6,
-.moment-image-7,
-.moment-image-8,
-.moment-image-9 {
+/* 统一的网格图片样式 */
+.moment-image-grid {
 	width: 100%;
 	height: 200rpx;
+	border-radius: 12rpx;
+	overflow: hidden;
 }
 
 /* 位置信息 */
@@ -213,20 +208,27 @@
 /* 底部操作按钮 */
 .moment-actions {
 	display: flex;
-	justify-content: space-around;
+	justify-content: flex-end;
 	align-items: center;
-	padding-top: 16rpx;
+	gap: 16rpx;
+	padding-top: 8rpx;
 }
 
 .action-item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 12rpx;
-	padding: 16rpx 32rpx;
+	gap: 8rpx;
+	padding: 8rpx 24rpx;
 	border-radius: 16rpx;
 	transition: all 0.3s ease;
-	flex: 1;
+	flex: 0 0 auto;
+}
+
+/* 横向排列的按钮（点赞和评论） */
+.action-item-horizontal {
+	flex-direction: row;
+	justify-content: center;
 }
 
 .action-item:active {
@@ -251,6 +253,7 @@
 
 /* 空状态 */
 .empty-container {
+	width: 700rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -258,6 +261,7 @@
 	background: #fff;
 	border-radius: 24rpx;
 	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+	box-sizing: border-box;
 }
 
 /* 分割线自定义样式 */
