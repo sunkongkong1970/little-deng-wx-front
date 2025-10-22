@@ -583,16 +583,29 @@ Page({
     try {
       // 如果选择了新图片，上传图片
       if (avatarOriginal && avatarCropped && avatarOriginal !== this.data.babyInfo.childCoverImg) {
+        wx.showLoading({ title: '上传图片中...' });
+        
         const uploadResultCropped = await api.uploadImageFile(token, 'BABY', avatarCropped);
         const uploadResultOriginal = await api.uploadImageFile(token, 'BABY', avatarOriginal);
         
+        console.log('图片上传成功:', {
+          裁剪图: uploadResultCropped,
+          原图: uploadResultOriginal
+        });
+        
+        // 更新到 babyInfo 的正确字段
         this.setData({
+          'babyInfo.childCoverImg': uploadResultOriginal,
+          'babyInfo.childCoverCroppedImg': uploadResultCropped,
           'babyInfo.avatarCropped': uploadResultCropped,
           'babyInfo.avatarOriginal': uploadResultOriginal
         });
+        
+        wx.hideLoading();
       }
     } catch (error) {
       console.error('上传图片失败:', error);
+      wx.hideLoading();
       wx.showToast({
         title: '上传图片失败',
         icon: 'none'
@@ -607,11 +620,19 @@ Page({
     const babyInfoToSubmit = {
       ...this.data.babyInfo,
       childId: childId, // 添加id字段
-      childBirthday: fullBirthday
+      childBirthday: fullBirthday,
+      // 确保封面图字段正确传递
+      childCoverImg: this.data.babyInfo.childCoverImg,
+      childCoverCroppedImg: this.data.babyInfo.childCoverCroppedImg
     };
     
     try {
+      wx.showLoading({ title: '保存中...' });
+      
       const result = await api.editBaby(token, babyInfoToSubmit);
+      
+      wx.hideLoading();
+      
       if (result) {
         wx.showToast({
           title: '更新成功',
@@ -622,9 +643,27 @@ Page({
         // 退出编辑模式并重新加载数据
         this.setData({ isEdit: false });
         await this.loadBabyDetail(this.data.childId);
+        
+        // 通知其他页面刷新数据
+        const pages = getCurrentPages();
+        
+        // 查找并刷新 baby 页面
+        const babyPage = pages.find(page => page.route === 'pages/baby/baby');
+        if (babyPage && typeof babyPage.loadBabyList === 'function') {
+          console.log('通知 baby 页面刷新数据');
+          babyPage.loadBabyList();
+        }
+        
+        // 查找并刷新 moment 页面
+        const momentPage = pages.find(page => page.route === 'pages/moment/moment');
+        if (momentPage && typeof momentPage.loadBabyImages === 'function') {
+          console.log('通知 moment 页面刷新宝宝图片');
+          momentPage.loadBabyImages();
+        }
       }
     } catch (error) {
       console.error('更新失败:', error);
+      wx.hideLoading();
       wx.showToast({
         title: error.message || '更新失败',
         icon: 'none'

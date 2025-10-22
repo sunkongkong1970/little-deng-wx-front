@@ -24,7 +24,6 @@ Page({
       const token = wx.getStorageSync('token');
       if (token && !showAuth) {
         const res = await api.getUserInfo(token);
-        console.log(res)
         if (!res) {
           throw new Error(res?.message || '获取用户信息失败');
         }
@@ -73,8 +72,7 @@ Page({
 
       // 调用接口获取宝宝列表
       const babyList = await api.getBabyList(userInfo.homeId);
-      console.log('宝宝列表:', babyList);
-
+    
       this.setData({
         babyList: babyList || [],
         hasBaby: babyList && babyList.length > 0
@@ -259,13 +257,19 @@ Page({
   // 根据图片右上角颜色自动调整文字颜色
   onImageLoad(e) {
     // 创建canvas上下文用于获取图片像素信息
-    const query = wx.createSelectorQuery()
+    const query = wx.createSelectorQuery().in(this)
     query.select('#color-detector')
       .fields({
         node: true,
         size: true
       })
       .exec((res) => {
+        // 添加错误处理
+        if (!res || !res[0] || !res[0].node) {
+          console.warn('Canvas 元素未找到，跳过颜色检测');
+          return;
+        }
+        
         const canvas = res[0].node
         const ctx = canvas.getContext('2d')
 

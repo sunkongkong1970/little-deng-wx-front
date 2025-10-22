@@ -17,50 +17,52 @@
 	
 	<!-- 朋友圈动态列表 -->
 	<view class="moments-container">
-		<block wx:for="{{posts}}" wx:key="id">
+		<block wx:for="{{posts}}" wx:key="id" wx:for-item="post" wx:for-index="postIndex">
 		<view class="moment-card">
 			<view class="moment-header">
 				<view class="user-section">
-					<image class="moment-avatar" src="{{item.avatar}}" mode="aspectFill" />
+					<image class="moment-avatar" src="{{post.avatar}}" mode="aspectFill" />
 					<view class="user-info">
-						<text class="user-name">{{item.nick}}</text>
-						<text class="post-time">{{item.time}}</text>
+						<text class="user-name">{{post.nick}}</text>
+						<text class="post-time">{{post.time}}</text>
 					</view>
 				</view>
 			</view>
 				
-				<view class="moment-content">
-					<text class="content-text">{{item.text}}</text>
-				</view>
-				
+			<view class="moment-content">
+				<text class="content-text">{{post.text}}</text>
+			</view>
+			
 			<!-- 图片展示区域 -->
-			<view class="moment-images" wx:if="{{item.images && item.images.length > 0}}">
-				<block wx:for="{{item.images.slice(0, 9)}}" wx:key="index" wx:for-item="img">
-					<t-image 
-						class="moment-image moment-image-grid" 
-						src="{{img}}" 
-						mode="aspectFill"
-						shape="round"
-						bindtap="previewImage"
-						data-urls="{{item.images}}"
-						data-current="{{img}}"
-					/>
-				</block>
+			<view class="moment-images" wx:if="{{post.images && post.images.length > 0}}">
+				<image 
+					wx:for="{{post.images}}" 
+					wx:key="index" 
+					wx:for-item="imageUrl" 
+					wx:for-index="imgIndex"
+					wx:if="{{imgIndex < 9}}"
+					class="moment-image moment-image-grid" 
+					src="{{imageUrl}}" 
+					mode="aspectFill"
+					bindtap="previewImage"
+					data-urls="{{post.images}}"
+					data-current="{{imageUrl}}"
+				/>
 			</view>
 				
-				<view class="moment-location" wx:if="{{item.loc}}">
+				<view class="moment-location" wx:if="{{post.loc}}">
 					<t-icon name="location" size="24rpx" color="#0052d9" />
-					<text class="location-text">{{item.loc}}</text>
+					<text class="location-text">{{post.loc}}</text>
 				</view>
 				
 				<t-divider />
 				
 			<view class="moment-actions">
-				<view class="action-item action-item-horizontal {{item.liked ? 'liked' : ''}}" bindtap="onLike" data-index="{{index}}">
-					<t-icon name="{{item.liked ? 'thumb-up-filled' : 'thumb-up'}}" size="36rpx" color="{{item.liked ? '#0052d9' : '#999'}}" />
-					<text class="action-text {{item.liked ? 'active' : ''}}">{{item.likeCount > 0 ? item.likeCount : '赞'}}</text>
+				<view class="action-item action-item-horizontal {{post.liked ? 'liked' : ''}}" bindtap="onLike" data-index="{{postIndex}}">
+					<t-icon name="{{post.liked ? 'thumb-up-filled' : 'thumb-up'}}" size="36rpx" color="{{post.liked ? '#0052d9' : '#999'}}" />
+					<text class="action-text {{post.liked ? 'active' : ''}}">{{post.likeCount > 0 ? post.likeCount : '赞'}}</text>
 				</view>
-				<view class="action-item action-item-horizontal" bindtap="onComment" data-index="{{index}}">
+				<view class="action-item action-item-horizontal" bindtap="onComment" data-index="{{postIndex}}">
 					<t-icon name="chat" size="36rpx" color="#999" />
 					<text class="action-text">评论</text>
 				</view>

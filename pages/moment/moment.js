@@ -69,9 +69,6 @@ Page({
 			const avatarUrl = wx.getStorageSync('avatarUrl');
 			const token = wx.getStorageSync('token');
 			
-			console.log('加载用户信息 - userInfo:', userInfo);
-			console.log('加载用户信息 - nickname:', nickname);
-			console.log('加载用户信息 - avatarUrl:', avatarUrl);
 			
 			// 设置昵称
 			if (userInfo && userInfo.userName) {
@@ -88,15 +85,11 @@ Page({
 			if (token) {
 				try {
 					const latestUserInfo = await api.getUserInfo(token);
-					console.log('从服务器获取的最新用户信息:', latestUserInfo);
 					
-					// 更新缓存
 					if (latestUserInfo) {
 						wx.setStorageSync('userInfo', latestUserInfo);
 						
-						// 使用数据库中的头像URL（用户上传的真实头像）
 						if (latestUserInfo.userAvatarUrl) {
-							console.log('使用数据库中的真实头像:', latestUserInfo.userAvatarUrl);
 							this.setData({
 								userAvatar: latestUserInfo.userAvatarUrl
 							});
@@ -110,12 +103,10 @@ Page({
 
 			// 降级方案：使用缓存中的头像
 			if (userInfo && userInfo.userAvatarUrl) {
-				console.log('使用缓存中的 userInfo.userAvatarUrl:', userInfo.userAvatarUrl);
 				this.setData({
 					userAvatar: userInfo.userAvatarUrl
 				});
 			} else {
-				console.log('使用默认头像');
 				this.setData({
 					userAvatar: '/assets/default.png'
 				});
@@ -140,8 +131,6 @@ Page({
 
 			const babyList = await api.getBabyList(userInfo.homeId);
 			if (babyList && babyList.length > 0) {
-				console.log('宝宝列表:', babyList);
-				
 				// 创建照片对象数组，保持裁剪图和原图的对应关系
 				const imageList = babyList
 					.filter(baby => baby.childCoverCroppedImg || baby.childCoverImg)
@@ -192,29 +181,10 @@ Page({
 			const pageNum = refresh ? 1 : this.data.pageNum;
 			const result = await api.getPhotoWallList(token, pageNum, this.data.pageSize);
 
-			console.log('照片墙API返回数据:', result);
-
 			if (result && result.list) {
-				console.log('照片墙列表数据:', result.list);
-				console.log('照片墙数据数量:', result.list.length);
-				
-				// 测试第一张图片URL
-				if (result.list.length > 0 && result.list[0].images && result.list[0].images.length > 0) {
-					console.log('测试图片URL:', result.list[0].images[0]);
-					console.log('复制此URL到浏览器测试能否打开');
-				}
-				
 				// 转换数据格式
 				const formattedPosts = result.list.map((item, index) => {
-					console.log(`\n===== 第${index + 1}条照片墙数据 =====`);
-					console.log('完整数据:', item);
-					console.log('ID:', item.id);
-					console.log('创建者角色:', item.createUserRoleName);
-					console.log('创建者头像URL:', item.createUserAvatar);
-					console.log('图片列表:', item.images);
-					console.log('图片数量:', item.images ? item.images.length : 0);
-					
-					const post = {
+					return {
 						id: item.id,
 						nick: item.createUserRoleName || '家庭成员',
 						avatar: item.createUserAvatar && item.createUserAvatar.trim() !== '' 
@@ -227,13 +197,6 @@ Page({
 						likeCount: item.likeCount || 0,
 						images: Array.isArray(item.images) ? item.images : []
 					};
-					
-					console.log('转换后的数据:', post);
-					console.log('转换后的头像:', post.avatar);
-					console.log('转换后的图片:', post.images);
-					console.log('========================\n');
-					
-					return post;
 				});
 
 				const posts = refresh ? formattedPosts : [...this.data.posts, ...formattedPosts];
@@ -353,20 +316,19 @@ Page({
 	 * 头像加载成功
 	 */
 	onAvatarLoad(e) {
-		console.log('头像加载成功:', e);
+		// 头像加载成功
 	},
 
 	/**
 	 * 头像加载失败
 	 */
 	onAvatarError(e) {
-		console.error('头像加载失败:', e);
-		console.error('失败的图片URL:', this.data.userAvatar);
 		// 加载失败时使用默认头像
 		this.setData({
 			userAvatar: '/assets/default.png'
 		});
 	},
+
 
 	/**
 	 * 点赞/取消点赞
@@ -397,7 +359,9 @@ Page({
 				posts: posts
 			});
 
-			// 调用API
+      // 调用API
+      console.log(token)
+      console.log(post.id)
 			const result = await api.togglePhotoWallLike(token, post.id);
 
 			// 显示点赞动画提示

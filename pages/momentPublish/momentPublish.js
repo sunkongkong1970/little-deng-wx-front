@@ -243,14 +243,14 @@ Page({
 				return;
 			}
 
-			// 显示加载提示
+			// 上传图片并获取URL列表（uploadImages内部会显示进度）
+			const imgUrls = await this.uploadImages(token);
+
+			// 图片上传完成后，显示发布提示
 			wx.showLoading({
-				title: '发布中...',
+				title: '正在发布...',
 				mask: true
 			});
-
-			// 上传图片并获取URL列表
-			const imgUrls = await this.uploadImages(token);
 
 			// 准备发布数据
 			const photoWallData = {
@@ -261,8 +261,6 @@ Page({
 				location: this.data.location ? this.data.location.name : '',
 				imgUrls: imgUrls
 			};
-
-			console.log('发布照片墙数据：', photoWallData);
 
 			// 调用API创建照片墙
 			const photoWallId = await api.createPhotoWall(token, photoWallData);
@@ -305,30 +303,44 @@ Page({
 	},
 
 	/**
-	 * 上传图片
+	 * 上传图片（顺序上传，避免并发问题）
 	 * @param {String} token 用户token
 	 * @returns {Promise<Array<String>>} 上传后的图片URL列表
 	 */
 	async uploadImages(token) {
 		const images = this.data.images;
 		if (!images || images.length === 0) {
+			// 没有图片，返回空数组
 			return [];
 		}
 
-		const uploadPromises = images.map(async (imagePath) => {
+		const imgUrls = [];
+		const totalCount = images.length;
+
+		// 顺序上传每张图片
+		for (let index = 0; index < images.length; index++) {
+			const imagePath = images[index];
+			
+			// 更新上传进度提示
+			wx.showLoading({
+				title: `上传中 ${index + 1}/${totalCount}`,
+				mask: true
+			});
+			
 			try {
 				// 调用图片上传接口
 				const imageUrl = await api.uploadImageFile(token, 'DAILY', imagePath);
-				console.log('图片上传成功:', imageUrl);
-				return imageUrl;
+				imgUrls.push(imageUrl);
 			} catch (error) {
-				console.error('图片上传失败:', error);
-				throw new Error('图片上传失败');
+				console.error(`第 ${index + 1} 张图片上传失败:`, error);
+				wx.hideLoading();
+				throw new Error(`第 ${index + 1} 张图片上传失败`);
 			}
-		});
-
-		// 等待所有图片上传完成
-		const imgUrls = await Promise.all(uploadPromises);
+		}
+		
+		// 上传完成后关闭 loading
+		wx.hideLoading();
+		
 		return imgUrls;
 	},
 

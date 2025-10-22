@@ -20,7 +20,6 @@ function request(url, method = 'GET', data = {}, params = {}) {
         } : {})
       },
       success: (res) => {
-        console.log(res)
         if (res.statusCode === 200) {
           const body = res.data;
           if (body && typeof body === 'object' && Object.prototype.hasOwnProperty.call(body, 'code')) {
@@ -179,7 +178,7 @@ const api = {
   }),
 
   // 创建照片墙
-  createPhotoWall: (token, photoWallData) => request('/api/photo-wall/create', 'POST', {
+  createPhotoWall: (token, photoWallData) => request('/api/photo-wall/create', 'POST',{
     token,
     homeId: photoWallData.homeId,
     childIds: photoWallData.childIds,
@@ -187,16 +186,16 @@ const api = {
     postTime: photoWallData.postTime,
     location: photoWallData.location,
     imgUrls: photoWallData.imgUrls
-  }),
+  },{}),
 
   // 点赞或取消点赞
-  togglePhotoWallLike: (token, photoWallId) => request('/api/photo-wall/like', 'POST', {
+  togglePhotoWallLike: (token, photoWallId) => request('/api/photo-wall/like', 'POST', {}, {
     token,
     photoWallId
   }),
 
   // 删除照片墙
-  deletePhotoWall: (token, photoWallId) => request('/api/photo-wall/delete', 'POST', {
+  deletePhotoWall: (token, photoWallId) => request('/api/photo-wall/delete', 'POST', {},{
     token,
     photoWallId
   })
