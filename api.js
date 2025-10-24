@@ -1,4 +1,35 @@
 import config from './env.js';
+
+// 美化的错误提示
+function showErrorToast(message, code) {
+  const errorMessages = {
+    400: '请求参数错误',
+    401: '未授权，请先登录',
+    403: '没有权限访问',
+    404: '请求的资源不存在',
+    500: '服务器内部错误',
+    502: '网关错误',
+    503: '服务暂时不可用',
+    504: '登录已过期'
+  };
+
+  // 获取友好的错误消息
+  const friendlyMessage = errorMessages[code] || message;
+
+  wx.showModal({
+    title: '温馨提示',
+    content: friendlyMessage,
+    showCancel: false,
+    confirmText: '知道了',
+    confirmColor: '#07C160',
+    success: (res) => {
+      if (res.confirm) {
+        console.log('用户点击确定');
+      }
+    }
+  });
+}
+
 // 封装通用的请求方法
 function request(url, method = 'GET', data = {}, params = {}) {
   // 处理查询参数
@@ -38,10 +69,13 @@ function request(url, method = 'GET', data = {}, params = {}) {
               wx.removeStorageSync('token');
               wx.removeStorageSync('userInfo');
               
-              // 跳转到baby页面并显示登录弹窗
+              // 跳转到moment页面（主页）并显示登录弹窗
               wx.reLaunch({
-                url: '/pages/baby/baby?showAuth=true'
+                url: '/pages/moment/moment?showAuth=true'
               });
+            } else {
+              // 其他错误，显示美化的提示
+              showErrorToast(message, body.code);
             }
             
             reject(error);
@@ -53,11 +87,25 @@ function request(url, method = 'GET', data = {}, params = {}) {
         } else {
           const serverMsg = (res.data && (res.data.message || res.data.msg || res.data.error)) || '';
           const errMsg = serverMsg || `请求失败，状态码: ${res.statusCode}`;
+          
+          // 显示美化的错误提示
+          showErrorToast(errMsg, res.statusCode);
+          
           reject(new Error(errMsg));
         }
       },
       fail: (err) => {
         const errMsg = err && (err.errMsg || err.message) ? (err.errMsg || err.message) : '网络异常，请稍后重试';
+        
+        // 显示美化的网络错误提示
+        wx.showModal({
+          title: '网络异常',
+          content: '网络连接失败，请检查网络设置后重试',
+          showCancel: false,
+          confirmText: '知道了',
+          confirmColor: '#07C160'
+        });
+        
         reject(new Error(errMsg));
       }
     });
@@ -198,6 +246,47 @@ const api = {
   deletePhotoWall: (token, photoWallId) => request('/api/photo-wall/delete', 'POST', {},{
     token,
     photoWallId
+  }),
+
+  // ========== 评论相关接口 ==========
+  
+  // 创建评论
+  createComment: (token, photoWallId, commentContent, parentId = null) => request('/api/photo-wall/comment/create', 'POST', {
+    token,
+    photoWallId,
+    commentContent,
+    parentId
+  }, {}),
+
+  // 获取评论列表
+  getCommentList: (photoWallId) => request('/api/photo-wall/comment/list', 'GET', {}, {
+    photoWallId
+  }),
+
+  // 删除评论
+  deleteComment: (token, commentId) => request('/api/photo-wall/comment/delete', 'POST', {}, {
+    token,
+    commentId
+  }),
+
+  // ========== 家庭管理相关接口 ==========
+  
+  // 获取家庭信息
+  getFamilyInfo: (token, homeId) => request('/api/home/info', 'GET', {}, {
+    token,
+    homeId
+  }),
+
+  // 更新家庭信息
+  updateFamilyInfo: (token, homeId, homeName) => request('/api/home/update', 'POST', {}, 
+  {token,
+    homeId,
+    homeName}),
+
+  // 获取家庭成员列表
+  getFamilyMembers: (token, homeId) => request('/api/home/members', 'GET', {}, {
+    token,
+    homeId
   })
 };
 export default api;

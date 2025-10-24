@@ -1,0 +1,69 @@
+<view class="page">
+  <!-- 家庭信息卡片 -->
+  <view class="family-card">
+    <view class="card-header">
+      <text class="card-title">{{isEditMode ? '编辑家庭信息' : '家庭信息'}}</text>
+    </view>
+
+    <view class="card-body">
+      <!-- 家庭名称 -->
+      <view class="info-item">
+        <text class="info-label">家庭名称</text>
+        <block wx:if="{{!isEditMode}}">
+          <text class="info-value">{{familyInfo.familyName}}</text>
+        </block>
+        <block wx:else>
+          <input 
+            class="info-input" 
+            value="{{editFamilyName}}" 
+            placeholder="请输入家庭名称"
+            bindinput="onFamilyNameInput"
+          />
+        </block>
+      </view>
+
+      <!-- 创建时间 -->
+      <view class="info-item">
+        <text class="info-label">创建时间</text>
+        <text class="info-value">{{familyInfo.createTime}}</text>
+      </view>
+
+      <!-- 成员数量 -->
+      <view class="info-item">
+        <text class="info-label">家庭成员</text>
+        <text class="info-value">{{familyInfo.memberCount}}人</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 家庭成员列表（仅户主可见） -->
+  <view class="members-card" wx:if="{{isHouseholder && members.length > 0}}">
+    <view class="card-header">
+      <text class="card-title">家庭成员</text>
+    </view>
+    <view class="members-list">
+      <view class="member-item" wx:for="{{members}}" wx:key="id">
+        <image class="member-avatar" src="{{item.userAvatarUrl || '/assets/default.png'}}" mode="aspectFill" />
+        <view class="member-info">
+          <text class="member-name">{{item.userName || '未设置昵称'}}</text>
+          <view class="member-tags">
+            <text class="member-tag">{{item.userRoleName}}</text>
+            <text class="member-tag admin" wx:if="{{item.isHouseholder}}">管理员</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮区域 -->
+  <view class="footer-buttons" wx:if="{{isHouseholder}}">
+    <block wx:if="{{!isEditMode}}">
+      <button class="btn btn-primary" bindtap="onEdit">编辑</button>
+    </block>
+    <block wx:else>
+      <button class="btn btn-default" bindtap="onCancelEdit">取消</button>
+      <button class="btn btn-primary" bindtap="onSave">保存</button>
+    </block>
+  </view>
+</view>
+

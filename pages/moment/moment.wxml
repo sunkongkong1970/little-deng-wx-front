@@ -11,7 +11,8 @@
 		</view>
 		<!-- 发布按钮 -->
 		<view class="publish-btn" bindtap="goToPublish" catchtap="goToPublish">
-			<t-icon name="edit" size="40rpx" color="#fff" />
+			<t-icon name="heart-filled" size="56rpx" color="#ff4d6d" class="heart-icon" />
+			<t-icon name="add" size="32rpx" color="#fff" class="add-icon" />
 		</view>
 	</view>
 	
@@ -58,20 +59,37 @@
 				<t-divider />
 				
 			<view class="moment-actions">
+				<view wx:if="{{post.createUserId === currentUserId || isHouseholder}}" class="action-item action-item-horizontal action-item-delete" bindtap="onDelete" data-index="{{postIndex}}">
+					<t-icon name="delete" size="36rpx" color="#ff4444" />
+					<text class="action-text delete-text">删除</text>
+				</view>
 				<view class="action-item action-item-horizontal {{post.liked ? 'liked' : ''}}" bindtap="onLike" data-index="{{postIndex}}">
 					<t-icon name="{{post.liked ? 'thumb-up-filled' : 'thumb-up'}}" size="36rpx" color="{{post.liked ? '#0052d9' : '#999'}}" />
 					<text class="action-text {{post.liked ? 'active' : ''}}">{{post.likeCount > 0 ? post.likeCount : '赞'}}</text>
 				</view>
 				<view class="action-item action-item-horizontal" bindtap="onComment" data-index="{{postIndex}}">
 					<t-icon name="chat" size="36rpx" color="#999" />
-					<text class="action-text">评论</text>
+					<text class="action-text">{{post.commentCount > 0 ? post.commentCount : '评论'}}</text>
+				</view>
+			</view>
+
+			<!-- 评论预览区域 -->
+			<view class="comment-preview" wx:if="{{post.previewComments && post.previewComments.length > 0}}">
+				<view class="preview-comment-item" wx:for="{{post.previewComments}}" wx:key="id" wx:for-item="comment">
+					<text class="preview-comment-role">{{comment.userRoleName || comment.userName}}：</text>
+					<text class="preview-comment-content">
+						<text wx:if="{{comment.parentUserName}}" class="preview-reply-to">回复@{{comment.parentUserName}} </text>{{comment.commentContent}}
+					</text>
+				</view>
+				<view class="more-comments" wx:if="{{post.commentCount > 3}}" bindtap="onComment" data-index="{{postIndex}}">
+					<text class="more-comments-text">...</text>
 				</view>
 			</view>
 			</view>
 		</block>
 		
 		<!-- 空状态提示 -->
-		<view class="empty-container" wx:if="{{posts.length === 0}}">
+		<view class="empty-container" wx:if="{{posts.length === 0 && !authVisible}}">
 			<t-empty 
 				icon="info-circle" 
 				description="还没有朋友圈动态"
@@ -80,6 +98,95 @@
 					发布第一条动态
 				</t-button>
 			</t-empty>
+		</view>
+	</view>
+
+	<!-- 登录弹窗 -->
+	<view class="auth-mask" wx:if="{{authVisible}}" bindtap="closeAuth">
+		<view class="auth-modal" catchtap="stopPropagation">
+			<view class="brand">
+				<t-image src="/assets/default.png" width="80" height="80" shape="round" />
+				<text class="slogan">欢迎使用 成长日记 小程序，登录后即可记录宝宝的美好时光</text>
+			</view>
+			<view class="actions">
+				<t-button wx:if="{{canIUseGetUserProfile}}" bindtap="onGetUserProfile">微信授权登录</t-button>
+			</view>
+		</view>
+	</view>
+
+	<!-- 点赞动画 -->
+	<view class="like-animation-container" wx:if="{{likeAnimVisible}}">
+		<view class="like-animation {{likeAnimType}}" key="{{likeAnimKey}}">
+			<view class="heart-icon" wx:if="{{likeAnimType === 'like'}}">❤️</view>
+			<view class="heart-break-container" wx:if="{{likeAnimType === 'unlike'}}">
+				<view class="heart-piece heart-piece-1">💔</view>
+				<view class="heart-piece heart-piece-2">💔</view>
+			</view>
+		</view>
+	</view>
+
+	<!-- 评论弹窗 -->
+	<view class="comment-mask" wx:if="{{commentVisible}}" bindtap="closeCommentDialog">
+		<view class="comment-modal" catchtap="stopCommentPropagation">
+			<!-- 标题栏 -->
+			<view class="comment-header">
+				<text class="comment-title">评论 {{comments.length > 0 ? comments.length : ''}}</text>
+				<t-icon name="close" size="40rpx" color="#666" bindtap="closeCommentDialog" />
+			</view>
+
+			<!-- 评论列表 -->
+			<scroll-view class="comment-list" scroll-y>
+				<block wx:if="{{comments.length > 0}}">
+					<view class="comment-item" wx:for="{{comments}}" wx:key="id">
+						<view class="comment-user">
+							<image class="comment-avatar" src="{{item.userAvatar || '/assets/default.png'}}" mode="aspectFill" />
+							<view class="comment-info">
+								<view class="comment-user-info">
+									<text class="comment-username">{{item.userName}}</text>
+									<text class="comment-role" wx:if="{{item.userRoleName}}">{{item.userRoleName}}</text>
+								</view>
+								<text class="comment-time">{{item.createTime}}</text>
+							</view>
+						</view>
+						
+						<view class="comment-content">
+							<text wx:if="{{item.parentUserName}}" class="reply-to">回复 @{{item.parentUserName}}：</text>
+							<text>{{item.commentContent}}</text>
+						</view>
+
+						<view class="comment-actions">
+							<text class="comment-action-btn" bindtap="onReplyComment" data-comment-id="{{item.id}}" data-user-name="{{item.userName}}">回复</text>
+							<text class="comment-action-btn delete" wx:if="{{item.userId === userInfo.id}}" bindtap="onDeleteComment" data-comment-id="{{item.id}}">删除</text>
+						</view>
+					</view>
+				</block>
+				<view class="comment-empty" wx:else>
+					<t-icon name="chat" size="80rpx" color="#e0e0e0" />
+					<text class="empty-text">暂无评论，快来抢沙发吧~</text>
+				</view>
+			</scroll-view>
+
+			<!-- 回复提示 -->
+			<view class="reply-hint" wx:if="{{replyToUserName}}">
+				<text class="reply-hint-text">回复 @{{replyToUserName}}</text>
+				<t-icon name="close" size="32rpx" color="#999" bindtap="onCancelReply" />
+			</view>
+
+			<!-- 输入框 -->
+			<view class="comment-input-wrapper">
+				<input 
+					class="comment-input" 
+					placeholder="{{replyToUserName ? '回复 @' + replyToUserName : '说点什么吧...'}}"
+					value="{{commentInput}}"
+					bindinput="onCommentInput"
+					focus="{{inputFocus}}"
+					confirm-type="send"
+					bindconfirm="onSubmitComment"
+				/>
+				<view class="comment-send-btn {{commentInput ? 'active' : ''}}" bindtap="onSubmitComment">
+					发送
+				</view>
+			</view>
 		</view>
 	</view>
 </view>

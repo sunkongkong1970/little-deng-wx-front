@@ -1,11 +1,12 @@
 {
   "pages": [
+    "pages/moment/moment",
     "pages/baby/baby",
     "pages/familySelect/familySelect",
+    "pages/familyDetail/familyDetail",
     "pages/babyAdd/babyAdd",
     "pages/babyDetail/babyDetail",
     "pages/apps/apps",
-    "pages/moment/moment",
     "pages/momentPublish/momentPublish",
     "pages/mine/mine",
     "pages/authLogin/authLogin",

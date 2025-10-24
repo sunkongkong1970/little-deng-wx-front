@@ -4,12 +4,9 @@ Page({
   data: {
     hasBaby: true,
     textColor: '#ffffff',
-    authVisible: false,
-    loading: false,
-    hasUserInfo: false,
-    canIUseGetUserProfile: wx.canIUse('getUserProfile'),
     errorMsg: '',
-    babyList: [] // 宝宝列表
+    babyList: [], // 宝宝列表
+    isAdmin: false // 是否为管理员（户主）
   },
 
   async onLoad(options) {
@@ -17,42 +14,30 @@ Page({
       errorMsg: ''
     });
     
-    // 检查是否从登录过期跳转过来
-    const showAuth = options && options.showAuth === 'true';
-    
     try {
       const token = wx.getStorageSync('token');
-      if (token && !showAuth) {
-        const res = await api.getUserInfo(token);
-        if (!res) {
-          throw new Error(res?.message || '获取用户信息失败');
-        }
-        // 用户已登录，不需要显示登录弹窗
-        // 加载宝宝列表
-        await this.loadBabyList();
-      } else {
-        // 用户未登录或登录过期，显示登录弹窗
-        this.setData({
-          authVisible: true
+      if (!token) {
+        // 未登录，跳转到moment页面（主页）
+        wx.reLaunch({
+          url: '/pages/moment/moment'
         });
-        
-        // 如果是登录过期，显示提示
-        if (showAuth) {
-          wx.showToast({
-            title: '登录已过期，请重新登录',
-            icon: 'none',
-            duration: 2000
-          });
-        }
+        return;
       }
-    } catch (e) {
-      console.error('登录检查失败:', e);
+      
+      // 检查用户角色，判断是否为户主（管理员）
+      const userInfo = wx.getStorageSync('userInfo') || {};
+      const isAdmin = userInfo.isHouseholder === true; // true为户主
       this.setData({
-        authVisible: true
+        isAdmin: isAdmin
       });
-    } finally {
-      this.setData({
-        loading: false
+      
+      // 加载宝宝列表
+      await this.loadBabyList();
+    } catch (e) {
+      console.error('加载失败:', e);
+      // 出错时跳转到moment页面
+      wx.reLaunch({
+        url: '/pages/moment/moment'
       });
     }
   },
@@ -100,137 +85,11 @@ Page({
     }
   },
 
-  // 关闭登录弹窗
-  closeAuth() {
-    this.setData({
-      authVisible: false
-    });
-  },
-
-  // 阻止事件冒泡
-  stopPropagation() {
-    // 防止点击弹窗内容时触发mask的点击事件
-  },
-
   async onShow() {
     // 从添加宝宝页面返回时，刷新宝宝列表
     const token = wx.getStorageSync('token');
     if (token) {
       await this.loadBabyList();
-    }
-  },
-
-  //点击授权按钮后触发的回调
-  onGetUserProfile(e) {
-    wx.getUserProfile({
-      desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
-      success: (res) => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
-        console.log(res.userInfo)
-        const userInfo = res.userInfo;
-        // 2. 授权成功：提取用户信息并更新页面数据
-        this.setData({
-          userNickname: userInfo.nickName, // 昵称
-          avatarUrl: userInfo.avatarUrl
-        });
-        // 3. 缓存用户基础信息
-        wx.setStorageSync('nickname', userInfo.nickName || '');
-        wx.setStorageSync('avatarUrl', userInfo.avatarUrl || '');
-        // 完成后继续登录流程
-        this.serverLogin();
-      },
-      fail: (err) => {
-        // 接口调用失败的逻辑（如网络错误、权限问题）
-        wx.showToast({
-          title: '未授权，无法获取昵称和头像',
-          icon: 'none',
-          duration: 1500
-        });
-      },
-    })
-  },
-
-  async serverLogin() {
-    if (this.data.loading) return;
-    this.setData({
-      loading: true
-    });
-    try {
-      // 1. 获取登录凭证code
-      const {
-        code
-      } = await wx.login();
-      if (!code) {
-        throw new Error('获取code失败');
-      }
-      // 2. 登录换取 token
-      const loginData = await api.userLogin(code);
-      const token = loginData && loginData.token;
-      if (!token) {
-        throw new Error('登录失败');
-      }
-      // 3. 存储token
-      wx.setStorageSync('token', token);
-      // 4. 获取用户信息
-      const userRes = await api.getUserInfo(token);
-      let user;
-      if (userRes && typeof userRes.code !== 'undefined') {
-        if (userRes.code !== 0) {
-          wx.showToast({
-            title: userRes.message || '获取用户信息失败',
-            icon: 'none'
-          });
-          return;
-        }
-        user = userRes.data;
-      } else {
-        user = userRes;
-      }
-      if (!user) {
-        throw new Error('获取用户信息失败');
-      }
-
-      // 5. 保存用户信息到缓存
-      wx.setStorageSync('userInfo', user);
-      
-      // 6. 判断用户信息中是否存在昵称和头像，如果有则更新到缓存
-      if (user.userName) {
-        wx.setStorageSync('nickname', user.userName);
-      }
-
-      if(user.userAvatarUrl){
-        wx.setStorage('avatarUrl',user.userAvatarUrl)
-      }
-      console.log("111"+user.userAvatarUrl)
-
-      wx.showToast({
-        title: '登录成功'
-      });
-      this.setData({
-        authVisible: false
-      });
-
-      if (user.homeId) {
-        // 登录成功后加载宝宝列表
-        await this.loadBabyList();
-      } else {
-        wx.reLaunch({
-          url: '/pages/familySelect/familySelect'
-        });
-      }
-    } catch (err) {
-      console.error('登录失败:', err);
-      wx.showToast({
-        title: err.message || '登录失败',
-        icon: 'none'
-      });
-    } finally {
-      this.setData({
-        loading: false
-      });
     }
   },
 

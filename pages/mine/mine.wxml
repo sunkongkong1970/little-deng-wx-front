@@ -27,8 +27,11 @@
 
   <!-- 功能列表 -->
   <t-cell-group>
-    <t-cell title="家庭管理" arrow />
-    <t-cell title="隐私设置" arrow />
+    <t-cell 
+      title="{{userInfo.isHouseholder ? '家庭管理' : '家庭信息'}}" 
+      arrow 
+      bindtap="onFamilyManage"
+    />
     <t-cell title="关于我们" arrow />
   </t-cell-group>
 

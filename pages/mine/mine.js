@@ -33,6 +33,11 @@ Page({
   // 辅助函数：为 base64 数据添加前缀
   formatBase64Image(base64Data) {
     if (!base64Data) return '';
+    // 确保是字符串类型
+    if (typeof base64Data !== 'string') {
+      console.warn('formatBase64Image: base64Data 不是字符串类型', typeof base64Data);
+      return '';
+    }
     // 如果已经有前缀，直接返回
     if (base64Data.startsWith('data:image')) return base64Data;
     // 如果是 http/https 链接，直接返回
@@ -83,22 +88,38 @@ Page({
     if (!avatarUrl && !localAvatarPath && token) {
       try {
         console.log('缓存中没有真实头像，从服务器获取...');
-        const avatarBase64 = await api.getUserAvatar(token);
-        if (avatarBase64) {
-          // 为 base64 数据添加前缀
-          const formattedAvatar = this.formatBase64Image(avatarBase64);
+        const avatarData = await api.getUserAvatar(token);
+        console.log('获取到的头像数据:', avatarData);
+        
+        if (avatarData) {
+          // avatarData 是一个对象 { userAvatarUrl, userAvatarBase64 }
+          // 优先使用 userAvatarUrl（URL格式），其次使用 userAvatarBase64
+          let avatarToUse = '';
           
-          // 缓存头像数据（保存格式化后的）
-          wx.setStorageSync('avatarUrl', formattedAvatar);
-          avatarUrl = formattedAvatar;
+          if (avatarData.userAvatarUrl) {
+            avatarToUse = avatarData.userAvatarUrl;
+            console.log('使用 userAvatarUrl:', avatarToUse);
+          } else if (avatarData.userAvatarBase64) {
+            // 为 base64 数据添加前缀
+            avatarToUse = this.formatBase64Image(avatarData.userAvatarBase64);
+            console.log('使用 userAvatarBase64（已格式化）');
+          }
           
-          // 同步更新 userInfo 缓存
-          userInfo.avatarUrl = formattedAvatar;
-          wx.setStorageSync('userInfo', userInfo);
-          
-          console.log('头像获取成功并已缓存，格式:', formattedAvatar.substring(0, 50) + '...');
+          if (avatarToUse) {
+            // 缓存头像数据
+            wx.setStorageSync('avatarUrl', avatarToUse);
+            avatarUrl = avatarToUse;
+            
+            // 同步更新 userInfo 缓存
+            userInfo.avatarUrl = avatarToUse;
+            wx.setStorageSync('userInfo', userInfo);
+            
+            console.log('头像获取成功并已缓存');
+          } else {
+            console.log('接口返回头像数据为空');
+          }
         } else {
-          console.log('接口返回头像为空');
+          console.log('接口返回数据为空');
         }
       } catch (err) {
         console.error('获取用户头像失败:', err);
@@ -482,6 +503,16 @@ Page({
           icon: 'success'
         });
       }
+    });
+  },
+
+  /**
+   * 点击家庭管理/家庭信息
+   */
+  onFamilyManage() {
+    const isHouseholder = this.data.userInfo.isHouseholder || false;
+    wx.navigateTo({
+      url: `/pages/familyDetail/familyDetail?isHouseholder=${isHouseholder}`
     });
   }
 });
