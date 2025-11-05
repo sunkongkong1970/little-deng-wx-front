@@ -86,10 +86,25 @@ Page({
   },
 
   async onShow() {
+    // 更新自定义 tabBar
+    this.updateTabBar();
+    
     // 从添加宝宝页面返回时，刷新宝宝列表
     const token = wx.getStorageSync('token');
     if (token) {
       await this.loadBabyList();
+    }
+  },
+
+  /**
+   * 更新自定义 tabBar
+   */
+  updateTabBar() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 0  // "宝宝"页面在管理员视图中的索引为 0
+      });
+      this.getTabBar().updateTabBar();
     }
   },
 

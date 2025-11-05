@@ -17,6 +17,27 @@
 	box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
 }
 
+/* 封面轮播容器 */
+.cover-swiper {
+	width: 700rpx;
+	height: 400rpx;
+	border-radius: 24rpx 24rpx 0 0;
+	overflow: hidden;
+}
+
+/* 封面轮播指示点优化 */
+.cover-swiper .wx-swiper-dot {
+	width: 16rpx;
+	height: 16rpx;
+	border-radius: 50%;
+	margin: 0 8rpx;
+}
+
+.cover-swiper .wx-swiper-dot-active {
+	width: 32rpx;
+	border-radius: 8rpx;
+}
+
 .cover-container {
 	position: relative;
 	width: 700rpx;
@@ -74,41 +95,43 @@
 	text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.5);
 }
 
-/* 发布按钮 */
+/* 发布按钮 - 心形 */
 .publish-btn {
 	position: absolute;
 	top: 32rpx;
 	right: 32rpx;
-	width: 80rpx;
-	height: 80rpx;
-	background: rgba(255, 255, 255, 0.95);
-	border-radius: 50%;
+	width: 100rpx;
+	height: 100rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 4rpx 16rpx rgba(255, 77, 109, 0.3);
-	transition: all 0.3s ease;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	z-index: 3;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	tap-highlight-color: transparent;
+	outline: none;
+	background: transparent;
+}
+
+/* 心形 */
+.heart-shape {
+	font-size: 80rpx;
+	line-height: 1;
+	background: linear-gradient(135deg, #ff6b9d 0%, #ff4d6d 50%, #c9184a 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	filter: drop-shadow(0 8rpx 24rpx rgba(255, 77, 109, 0.45)) drop-shadow(0 4rpx 8rpx rgba(255, 77, 109, 0.25));
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .publish-btn:active {
-	transform: scale(0.9);
-	box-shadow: 0 2rpx 8rpx rgba(255, 77, 109, 0.2);
+	transform: scale(0.88);
 }
 
-.publish-btn .heart-icon {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-}
-
-.publish-btn .add-icon {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	z-index: 1;
+.publish-btn:active .heart-shape {
+	filter: drop-shadow(0 4rpx 12rpx rgba(255, 77, 109, 0.35)) drop-shadow(0 2rpx 4rpx rgba(255, 77, 109, 0.2));
 }
 
 /* 朋友圈列表容器 */

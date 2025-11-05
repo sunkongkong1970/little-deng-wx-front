@@ -1,5 +1,5 @@
 <view class="page">
-	<text class="section">宝宝管理</text>
+	
 	<t-grid column="2" gutter="15">
 		<t-grid-item bindtap="goGrowth">
 			<t-image src="/assets/default.png" width="60" height="60" shape="circle" />

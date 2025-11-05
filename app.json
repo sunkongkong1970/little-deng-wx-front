@@ -14,6 +14,7 @@
     "pages/image-cropper/image-cropper"
   ],
   "tabBar": {
+    "custom": true,
     "color": "#666666",
     "selectedColor": "#07C160",
     "backgroundColor": "#ffffff",
@@ -21,27 +22,19 @@
     "list": [
       {
         "pagePath": "pages/baby/baby",
-        "text": "宝宝",
-        "iconPath": "assets/default.png",
-        "selectedIconPath": "assets/default.png"
+        "text": "宝宝"
+      },   
+      {
+        "pagePath": "pages/moment/moment",
+        "text": "时光"
       },
       {
         "pagePath": "pages/apps/apps",
-        "text": "应用",
-        "iconPath": "assets/default.png",
-        "selectedIconPath": "assets/default.png"
-      },
-      {
-        "pagePath": "pages/moment/moment",
-        "text": "时光",
-        "iconPath": "assets/default.png",
-        "selectedIconPath": "assets/default.png"
+        "text": "应用"
       },
       {
         "pagePath": "pages/mine/mine",
-        "text": "我的",
-        "iconPath": "assets/default.png",
-        "selectedIconPath": "assets/default.png"
+        "text": "我的"
       }
     ]
   },

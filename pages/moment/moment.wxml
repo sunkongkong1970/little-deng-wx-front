@@ -1,19 +1,41 @@
 <view class="page">
 	<!-- 个人信息头部卡片 -->
 	<view class="profile-card">
-		<view class="cover-container" bindtap="previewCoverImage">
+	<!-- 多个宝宝：封面轮播 -->
+	<swiper 
+		wx:if="{{babyList && babyList.length > 1}}"
+		class="cover-swiper"
+		current="{{currentBabyIndex}}"
+		indicator-dots="{{true}}"
+		indicator-color="rgba(255, 255, 255, 0.3)"
+		indicator-active-color="#fff"
+		circular="{{true}}"
+		autoplay="{{swiperAutoplay}}"
+		interval="{{swiperInterval}}"
+		duration="{{swiperDuration}}"
+		bindchange="onCoverSwiperChange"
+	>
+			<swiper-item wx:for="{{babyList}}" wx:key="id" wx:for-item="baby">
+				<view class="cover-container" bindtap="goToBabyDetail" data-baby-id="{{baby.id}}">
+					<t-image class="cover-image" src="{{baby.avatar}}" mode="aspectFill" shape="round" />
+					<view class="overlay"></view>
+				</view>
+			</swiper-item>
+		</swiper>
+		<!-- 单个宝宝或无数据：单张封面 -->
+		<view wx:else class="cover-container" bindtap="{{babyList && babyList.length === 1 ? 'goToBabyDetail' : 'previewCoverImage'}}" data-baby-id="{{babyList && babyList.length === 1 ? babyList[0].id : ''}}">
 			<t-image class="cover-image" src="{{coverImage}}" mode="aspectFill" shape="round" />
 			<view class="overlay"></view>
 		</view>
-		<view class="user-info-container">
-			<image class="user-avatar" src="{{userAvatar}}" mode="aspectFill" binderror="onAvatarError" bindload="onAvatarLoad" />
-			<text class="user-nickname">{{userNickname}}</text>
-		</view>
-		<!-- 发布按钮 -->
-		<view class="publish-btn" bindtap="goToPublish" catchtap="goToPublish">
-			<t-icon name="heart-filled" size="56rpx" color="#ff4d6d" class="heart-icon" />
-			<t-icon name="add" size="32rpx" color="#fff" class="add-icon" />
-		</view>
+		
+	<view class="user-info-container">
+		<image class="user-avatar" src="{{userAvatar}}" mode="aspectFill" binderror="onAvatarError" bindload="onAvatarLoad" />
+		<text class="user-nickname">{{userNickname}}</text>
+	</view>
+	<!-- 发布按钮 -->
+	<view class="publish-btn" bindtap="goToPublish" catchtap="goToPublish" hover-class="none">
+		<view class="heart-shape">❤</view>
+	</view>
 	</view>
 	
 	<!-- 朋友圈动态列表 -->

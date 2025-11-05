@@ -16,6 +16,12 @@ Page({
 		loading: false,
 		babyImages: [], // 存储baby裁剪照片列表
 		babyOriginalImages: [], // 存储baby原图列表
+		babyList: [], // 宝宝列表（包含完整信息）
+		currentBabyIndex: 0, // 当前显示的宝宝索引
+		// 轮播配置
+		swiperAutoplay: true, // 是否自动播放
+		swiperInterval: 3000, // 自动切换时间间隔（毫秒）
+		swiperDuration: 500, // 滑动动画时长（毫秒）
 		authVisible: false, // 登录弹窗显示状态
 		canIUseGetUserProfile: wx.canIUse('getUserProfile'),
 		
@@ -71,6 +77,9 @@ Page({
 	},
 
 	onShow() {
+		// 更新自定义 tabBar
+		this.updateTabBar();
+		
 		// 页面显示时检查登录状态并刷新数据
 		const token = wx.getStorageSync('token');
 		if (token && !this.data.authVisible) {
@@ -80,6 +89,26 @@ Page({
 			if (this.data.posts.length === 0) {
 				this.loadPhotoWallList(true);
 			}
+		}
+	},
+
+	/**
+	 * 更新自定义 tabBar
+	 */
+	updateTabBar() {
+		if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+			const userInfo = wx.getStorageSync('userInfo') || {};
+			const isHouseholder = userInfo.isHouseholder || false;
+			
+			// 根据是否是管理员计算当前页面的索引
+			// 如果是管理员："宝宝"=0, "时光"=1, "应用"=2, "我的"=3
+			// 如果不是管理员："时光"=0, "应用"=1, "我的"=2
+			const selected = isHouseholder ? 1 : 0;
+			
+			this.getTabBar().setData({
+				selected: selected
+			});
+			this.getTabBar().updateTabBar();
 		}
 	},
 
@@ -198,24 +227,30 @@ Page({
 
 			const babyList = await api.getBabyList(userInfo.homeId);
 			if (babyList && babyList.length > 0) {
-				// 创建照片对象数组，保持裁剪图和原图的对应关系
-				const imageList = babyList
-					.filter(baby => baby.childCoverCroppedImg || baby.childCoverImg)
-					.map(baby => ({
-						cropped: baby.childCoverCroppedImg || baby.childCoverImg, // 裁剪后的图片
-						original: baby.childCoverImg || baby.childCoverCroppedImg // 原图
-					}));
+				// 过滤有封面图的宝宝
+				const validBabies = babyList.filter(baby => baby.childCoverCroppedImg || baby.childCoverImg);
 				
-				if (imageList.length > 0) {
-					// 随机选择一张照片作为封面
-					const randomIndex = Math.floor(Math.random() * imageList.length);
-					const selectedImage = imageList[randomIndex];
+				if (validBabies.length > 0) {
+					// 创建宝宝信息数组
+					const babyInfoList = validBabies.map(baby => ({
+						id: baby.id,
+						name: baby.childName || '宝宝',
+						avatar: baby.childCoverCroppedImg || baby.childCoverImg,
+						coverOriginal: baby.childCoverImg || baby.childCoverCroppedImg
+					}));
+					
+					// 随机选择一个宝宝的封面
+					const randomIndex = Math.floor(Math.random() * babyInfoList.length);
+					const selectedBaby = babyInfoList[randomIndex];
 					
 					this.setData({
-						babyImages: imageList.map(img => img.cropped),
-						babyOriginalImages: imageList.map(img => img.original),
-						coverImage: selectedImage.cropped,
-						coverImageOriginal: selectedImage.original
+						babyList: babyInfoList,
+						currentBabyIndex: randomIndex,
+						coverImage: selectedBaby.avatar,
+						coverImageOriginal: selectedBaby.coverOriginal,
+						// 保留原有字段用于兼容
+						babyImages: babyInfoList.map(baby => baby.avatar),
+						babyOriginalImages: babyInfoList.map(baby => baby.coverOriginal)
 					});
 				}
 			}
@@ -392,6 +427,28 @@ Page({
 		wx.navigateTo({
 			url: '/pages/momentPublish/momentPublish'
 		});
+	},
+
+	/**
+	 * 封面 Swiper 切换事件
+	 */
+	onCoverSwiperChange(e) {
+		const currentIndex = e.detail.current;
+		this.setData({
+			currentBabyIndex: currentIndex
+		});
+	},
+
+	/**
+	 * 跳转到宝宝详情页
+	 */
+	goToBabyDetail(e) {
+		const babyId = e.currentTarget.dataset.babyId;
+		if (babyId) {
+			wx.navigateTo({
+				url: `/pages/babyDetail/babyDetail?id=${babyId}`
+			});
+		}
 	},
 
 	/**
