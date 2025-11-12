@@ -24,6 +24,10 @@ Page({
 		}
 	},
 
-	goGrowth(){ wx.navigateTo({ url:'/pages/growth/growth' }); },
-	goVaccine(){ wx.navigateTo({ url:'/pages/vaccine/vaccine' }); }
+	onAppTap() {
+		wx.showToast({
+			title: '功能开发中，敬请期待',
+			icon: 'none'
+		});
+	}
 });

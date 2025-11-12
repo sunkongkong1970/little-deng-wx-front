@@ -342,10 +342,11 @@
 	background-color: #ffffff;
 	border-top-left-radius: 30rpx;
 	border-top-right-radius: 30rpx;
-	padding: 60rpx 40rpx;
+	padding: 80rpx 40rpx;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	min-height: 38vh;
 	animation: slideUp 0.3s ease-out;
 }
 

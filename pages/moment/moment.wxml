@@ -129,7 +129,7 @@
 			<view class="brand">
 				<t-image src="/assets/default.png" width="80" height="80" shape="round" />
 				<text class="slogan">欢迎使用 成长日记 小程序，登录后即可记录宝宝的美好时光</text>
-			</view>
+      </view>
 			<view class="actions">
 				<t-button wx:if="{{canIUseGetUserProfile}}" bindtap="onGetUserProfile">微信授权登录</t-button>
 			</view>
